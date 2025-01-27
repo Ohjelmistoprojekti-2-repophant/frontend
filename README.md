@@ -17,6 +17,6 @@
 
 - [Veera Virtanen](https://github.com/Beanie-bean)
 - [Sara Hyvärinen](https://github.com/sarahyvarinen)
-- Mark Mäkelä
+- [Mark Mäkelä](https://github.com/MarMakHH)
 - [Kasper Snellman](https://github.com/bgz848)
 - [Juuso Karjanlahti](https://github.com/juusokarjanlahti/)
