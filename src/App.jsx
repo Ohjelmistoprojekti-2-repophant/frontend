@@ -69,7 +69,7 @@ const App = () => {
             </li>
           ))}
         </ul>
-      <h2>Create Project</h2>
+      <h2>Create new Project</h2>
       <input
         type="text"
         name="name"
