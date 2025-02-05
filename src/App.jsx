@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import './App.css';
+import { Stack, CssBaseline, Container, Typography, TextField, Button, Box } from '@mui/material';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -59,8 +59,10 @@ const App = () => {
   };
 
   return (
-    <div>
-      <h1>Projects</h1>
+    <Container maxWidth={false} sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+      <CssBaseline />
+      <Box>
+        <Typography variant="h2" sx={{ justifySelf: "center" }}>Projects</Typography>
         <ul>
           {projects.map(project => (
             <li key={project.id}>
@@ -69,23 +71,26 @@ const App = () => {
             </li>
           ))}
         </ul>
-      <h2>Create new Project</h2>
-      <input
-        type="text"
-        name="name"
-        placeholder="Name"
-        value={newProject.name}
-        onChange={handleInputChange}
-      />
-      <input
-        type="text"
-        name="description"
-        placeholder="Description"
-        value={newProject.description}
-        onChange={handleInputChange}
-      />
-      <button onClick={createProject}>Create</button>
-    </div>
+        <Typography variant="h5" sx={{ justifySelf: "center" }}>Create new Project</Typography>
+        <Stack direction="row" spacing={2} sx={{ justifySelf: "center", mt: 3 }}>
+          <TextField
+            type="text"
+            name="name"
+            placeholder="Name"
+            value={newProject.name}
+            onChange={handleInputChange}
+          />
+          <TextField
+            type="text"
+            name="description"
+            placeholder="Description"
+            value={newProject.description}
+            onChange={handleInputChange}
+          />
+          <Button variant="contained" onClick={createProject}>Create</Button>
+        </Stack>
+      </Box>
+    </Container>
   );
 };
 
