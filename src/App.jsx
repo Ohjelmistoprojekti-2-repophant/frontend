@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Stack, CssBaseline, Container, Typography, TextField, Button, Box } from '@mui/material';
+import { Stack, CssBaseline, Container, Typography, TextField, Button, Box, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import GithubRepoFetcher from './GithubRepoFetcher';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
 /**
  * App component is the main component of the application.
- * It manages the state of projects and provides functionality to fetch, create, and delete projects.
+ * It manages the state of projects and provides functionality to fetch, create, edit, and delete projects.
  *
  * @component
  * @returns {JSX.Element} The rendered component.
@@ -14,7 +14,8 @@ const apiUrl = import.meta.env.VITE_API_URL;
 const App = () => {
   const [projects, setProjects] = useState([]);
   const [newProject, setNewProject] = useState({ name: '', description: '' });
-
+  const [editProject, setEditProject] = useState(null);  // State for editing a project
+  const [open, setOpen] = useState(false); // State for modal visibility
 
   /**
    * useEffect hook to fetch projects when the component mounts.
@@ -25,7 +26,7 @@ const App = () => {
 
   /**
     * Fetch projects from the API and set the projects state.
-    * * Logs an error message if the fetch fails.
+    * Logs an error message if the fetch fails.
    */
   const fetchProjects = async () => {
     try {
@@ -92,6 +93,48 @@ const App = () => {
     setNewProject(projectDetails);
   };
 
+  /**
+   * Opens the edit dialog and sets the selected project for editing.
+   * @param {Object} project - The project to edit.
+   */
+  const handleEditClick = (project) => {
+    setEditProject(project);
+    setOpen(true);
+  };
+
+  /**
+   * Closes the edit dialog and resets the editProject state.
+   */
+  const handleClose = () => {
+    setOpen(false);
+    setEditProject(null);
+  };
+
+  /**
+   * Updates the editProject state when input values change in the edit dialog.
+   */
+  const handleEditChange = (e) => {
+    setEditProject({ ...editProject, [e.target.name]: e.target.value });
+  };
+
+  /**
+   * Saves the edited project by sending a PUT request to the API and updating the state.
+   */
+  const handleSave = async () => {
+    try {
+      await fetch(`${apiUrl}/api/projects/${editProject.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editProject),
+      });
+
+      setProjects(projects.map(p => (p.id === editProject.id ? editProject : p))); // Update project list
+      handleClose(); // Close modal
+    } catch (error) {
+      console.error('Error updating project:', error);
+    }
+  };
+
   return (
     <Container maxWidth={false} sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
       <CssBaseline />
@@ -126,8 +169,8 @@ const App = () => {
         </Stack>
         <GithubRepoFetcher setProjectDetails={setProjectDetails} />
       </Box>
-      
-     
+
+      {/* Edit project modal */}
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Edit Project</DialogTitle>
         <DialogContent>
