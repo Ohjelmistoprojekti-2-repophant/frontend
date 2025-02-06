@@ -1,19 +1,32 @@
 import { useState, useEffect } from 'react';
-import { Stack, CssBaseline, Container, Typography, TextField, Button, Box, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { Stack, CssBaseline, Container, Typography, TextField, Button, Box } from '@mui/material';
+import GithubRepoFetcher from './GithubRepoFetcher';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
+/**
+ * App component is the main component of the application.
+ * It manages the state of projects and provides functionality to fetch, create, and delete projects.
+ *
+ * @component
+ * @returns {JSX.Element} The rendered component.
+ */
 const App = () => {
   const [projects, setProjects] = useState([]);
   const [newProject, setNewProject] = useState({ name: '', description: '' });
-  const [editProject, setEditProject] = useState(null);  
-  const [open, setOpen] = useState(false); 
 
+
+  /**
+   * useEffect hook to fetch projects when the component mounts.
+   */
   useEffect(() => {
     fetchProjects();
   }, []);
 
-  // Fetch projects from the API and set the projects state
+  /**
+    * Fetch projects from the API and set the projects state.
+    * * Logs an error message if the fetch fails.
+   */
   const fetchProjects = async () => {
     try {
       const response = await fetch(`${apiUrl}/api/projects`);
@@ -24,7 +37,10 @@ const App = () => {
     }
   };
 
-  // Create a new project and add it to the projects state and the API
+  /**
+   * Creates a new project and adds it to the projects state and the API.
+   * Logs an error message if the creation fails.
+   */
   const createProject = async () => {
     try {
       const response = await fetch(`${apiUrl}/api/projects`, {
@@ -42,7 +58,10 @@ const App = () => {
     }
   };
 
-  // Delete a project from the projects state and the API
+  /**
+   * Deletes a project from the projects state and the API.
+   * Logs an error message if the deletion fails.
+   */
   const deleteProject = async (id) => {
     try {
       await fetch(`${apiUrl}/api/projects/${id}`, {
@@ -54,43 +73,23 @@ const App = () => {
     }
   };
 
-  // Update the newProject state when the input values change
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
+  /**
+   * Updates the newProject state when the input values change.
+   *
+   * @param {Object} event - The event object.
+   */
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
     setNewProject({ ...newProject, [name]: value });
   };
 
-  // Opens the modified project
-  const handleEditClick = (project) => {
-    setEditProject(project);
-    setOpen(true);
-  };
-
-  // Closes edit
-  const handleClose = () => {
-    setOpen(false);
-    setEditProject(null);
-  };
-
-  // Updates information
-  const handleEditChange = (e) => {
-    setEditProject({ ...editProject, [e.target.name]: e.target.value });
-  };
-
-  // Place for backend api
-  const handleSave = async () => {
-    try {
-      await fetch(`${apiUrl}/api/projects/${editProject.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(editProject),
-      });
-
-      setProjects(projects.map(p => (p.id === editProject.id ? editProject : p))); // Updates the list
-      handleClose(); 
-    } catch (error) {
-      console.error('Error updating project:', error);
-    }
+  /**
+   * Sets the project details with the provided details.
+   *
+   * @param {Object} projectDetails - The project details.
+   */
+  const setProjectDetails = (projectDetails) => {
+    setNewProject(projectDetails);
   };
 
   return (
@@ -125,6 +124,7 @@ const App = () => {
           />
           <Button variant="contained" onClick={createProject}>Create</Button>
         </Stack>
+        <GithubRepoFetcher setProjectDetails={setProjectDetails} />
       </Box>
       
      
