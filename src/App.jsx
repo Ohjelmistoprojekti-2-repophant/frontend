@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
-import { Stack, CssBaseline, Container, Typography, TextField, Button, Box } from '@mui/material';
+import { Stack, CssBaseline, Container, Typography, TextField, Button, Box, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
 const App = () => {
   const [projects, setProjects] = useState([]);
   const [newProject, setNewProject] = useState({ name: '', description: '' });
+  const [editProject, setEditProject] = useState(null);  
+  const [open, setOpen] = useState(false); 
 
   useEffect(() => {
     fetchProjects();
@@ -58,6 +60,39 @@ const App = () => {
     setNewProject({ ...newProject, [name]: value });
   };
 
+  // Opens the modified project
+  const handleEditClick = (project) => {
+    setEditProject(project);
+    setOpen(true);
+  };
+
+  // Closes edit
+  const handleClose = () => {
+    setOpen(false);
+    setEditProject(null);
+  };
+
+  // Updates information
+  const handleEditChange = (e) => {
+    setEditProject({ ...editProject, [e.target.name]: e.target.value });
+  };
+
+  // Place for backend api
+  const handleSave = async () => {
+    try {
+      await fetch(`${apiUrl}/api/projects/${editProject.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editProject),
+      });
+
+      setProjects(projects.map(p => (p.id === editProject.id ? editProject : p))); // Updates the list
+      handleClose(); 
+    } catch (error) {
+      console.error('Error updating project:', error);
+    }
+  };
+
   return (
     <Container maxWidth={false} sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
       <CssBaseline />
@@ -67,7 +102,8 @@ const App = () => {
           {projects.map(project => (
             <li key={project.id}>
               {project.name} - {project.description}
-              <button onClick={() => deleteProject(project.id)}>Delete</button>
+              <Button variant="outlined" color="primary" size="small" onClick={() => handleEditClick(project)}>Edit</Button>
+              <Button variant="outlined" color="error" size="small" onClick={() => deleteProject(project.id)}>Delete</Button>
             </li>
           ))}
         </ul>
@@ -90,6 +126,33 @@ const App = () => {
           <Button variant="contained" onClick={createProject}>Create</Button>
         </Stack>
       </Box>
+      
+     
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle>Edit Project</DialogTitle>
+        <DialogContent>
+          <TextField
+            label="Name"
+            fullWidth
+            name="name"
+            value={editProject?.name || ""}
+            onChange={handleEditChange}
+            margin="dense"
+          />
+          <TextField
+            label="Description"
+            fullWidth
+            name="description"
+            value={editProject?.description || ""}
+            onChange={handleEditChange}
+            margin="dense"
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="secondary">Cancel</Button>
+          <Button onClick={handleSave} color="primary">Save</Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };
