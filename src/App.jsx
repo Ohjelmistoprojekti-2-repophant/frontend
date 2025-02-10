@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Stack, CssBaseline, Container, Typography, TextField, Button, Box, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import GithubRepoFetcher from './GithubRepoFetcher';
+import { Masonry } from '@mui/lab';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -209,17 +210,28 @@ const App = () => {
         </DialogActions>
       </Dialog>
 
-      <Box sx={{ mt: 5 }}>
+      <Box sx={{ mt: 5, width: '80%' }}>
         <Typography variant="h4">Project List</Typography>
-        <ul>
-          {filteredProjects.map(project => (
-            <li key={project.id}>
-              {project.name} - {project.description}
-              <Button variant="outlined" color="primary" size="small" onClick={() => handleEditClick(project)}>Edit</Button>
-              <Button variant="outlined" color="error" size="small" onClick={() => deleteProject(project.id)}>Delete</Button>
-            </li>
+        <Masonry columns={3} spacing={2}>
+          {filteredProjects.map((project) => (
+            <Box key={project.id} sx={{
+              border: '1px solid #ddd',
+              padding: 2,
+              borderRadius: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'hidden', // Hide anything overflowing the container
+              wordWrap: 'break-word' // Prevent long words from overflowing
+            }}>
+              <Typography variant="h6">{project.name}</Typography>
+              <Typography variant="body2">{project.description}</Typography>
+              <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
+                <Button variant="outlined" color="primary" size="small" onClick={() => handleEditClick(project)}>Edit</Button>
+                <Button variant="outlined" color="error" size="small" onClick={() => deleteProject(project.id)}>Delete</Button>
+              </Stack>
+            </Box>
           ))}
-        </ul>
+        </Masonry>
       </Box>
     </Container>
   );
