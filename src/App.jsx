@@ -4,6 +4,13 @@ import GithubRepoFetcher from './GithubRepoFetcher';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
+/**
+ * App component is the main component of the application.
+ * It manages the state of projects and provides functionality to fetch, create, edit, and delete projects.
+ *
+ * @component
+ * @returns {JSX.Element} The rendered component.
+ */
 const App = () => {
   const [projects, setProjects] = useState([]);
   const [newProject, setNewProject] = useState({ name: '', description: '' });
@@ -11,10 +18,17 @@ const App = () => {
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState(""); // State for the search query
 
+  /**
+   * useEffect hook to fetch projects when the component mounts.
+   */
   useEffect(() => {
     fetchProjects();
   }, []);
 
+  /**
+    * Fetch projects from the API and set the projects state.
+    * Logs an error message if the fetch fails.
+   */
   const fetchProjects = async () => {
     try {
       const response = await fetch(`${apiUrl}/api/projects`);
@@ -25,6 +39,10 @@ const App = () => {
     }
   };
 
+   /**
+   * Creates a new project and adds it to the projects state and the API.
+   * Logs an error message if the creation fails.
+   */
   const createProject = async () => {
     try {
       const response = await fetch(`${apiUrl}/api/projects`, {
@@ -42,6 +60,10 @@ const App = () => {
     }
   };
 
+  /**
+   * Deletes a project from the projects state and the API.
+   * Logs an error message if the deletion fails.
+   */
   const deleteProject = async (id) => {
     try {
       await fetch(`${apiUrl}/api/projects/${id}`, {
@@ -53,29 +75,52 @@ const App = () => {
     }
   };
 
+  /**
+   * Updates the newProject state when the input values change.
+   *
+   * @param {Object} event - The event object.
+   */
   const handleInputChange = (event) => {
     const { name, value } = event.target;
     setNewProject({ ...newProject, [name]: value });
   };
 
+  /**
+   * Sets the project details with the provided details.
+   *
+   * @param {Object} projectDetails - The project details.
+   */
   const setProjectDetails = (projectDetails) => {
     setNewProject(projectDetails);
   };
 
+  /**
+   * Opens the edit dialog and sets the selected project for editing.
+   * @param {Object} project - The project to edit.
+   */
   const handleEditClick = (project) => {
     setEditProject(project);
     setOpen(true);
   };
 
+  /**
+   * Closes the edit dialog and resets the editProject state.
+   */
   const handleClose = () => {
     setOpen(false);
     setEditProject(null);
   };
 
+  /**
+   * Updates the editProject state when input values change in the edit dialog.
+   */
   const handleEditChange = (e) => {
     setEditProject({ ...editProject, [e.target.name]: e.target.value });
   };
 
+  /**
+   * Saves the edited project by sending a PUT request to the API and updating the state.
+   */
   const handleSave = async () => {
     try {
       await fetch(`${apiUrl}/api/projects/${editProject.id}`, {
@@ -127,6 +172,7 @@ const App = () => {
         <GithubRepoFetcher setProjectDetails={setProjectDetails} />
       </Box>
 
+      {/* Edit project modal */}
       <Box sx={{ mt: 3 }}>
         <TextField
           placeholder="Search Projects By Name"
