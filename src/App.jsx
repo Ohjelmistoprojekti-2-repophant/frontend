@@ -148,7 +148,7 @@ const App = () => {
   
 
   return (
-    <Container maxWidth={false} sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", flexDirection: "column" }}>
+    <Container maxWidth={false} sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column" }}>
       <CssBaseline />
       <Box>
         <Typography variant="h2">Projects</Typography>
