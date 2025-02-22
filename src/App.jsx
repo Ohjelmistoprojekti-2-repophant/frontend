@@ -14,7 +14,7 @@ const apiUrl = import.meta.env.VITE_API_URL;
  */
 const App = () => {
   const [projects, setProjects] = useState([]);
-  const [newProject, setNewProject] = useState({ name: '', description: '' });
+  const [newProject, setNewProject] = useState({ name: '', description: '', repositoryLink: '', language: '' });
   const [editProject, setEditProject] = useState(null);
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState(""); // State for the search query
@@ -55,7 +55,7 @@ const App = () => {
       });
       const data = await response.json();
       setProjects([...projects, data]);
-      setNewProject({ name: '', description: '' });
+      setNewProject({ name: '', description: '', repositoryLink: '', language: '' });
     } catch (error) {
       console.error('Error creating project:', error);
     }
@@ -92,7 +92,7 @@ const App = () => {
    * @param {Object} projectDetails - The project details.
    */
   const setProjectDetails = (projectDetails) => {
-    setNewProject(projectDetails);
+    setNewProject({ ...projectDetails, repositoryLink: projectDetails.html_url });
   };
 
   /**
@@ -168,6 +168,20 @@ const App = () => {
             value={newProject.description}
             onChange={handleInputChange}
           />
+          <TextField
+            type="text"
+            name="repositoryLink"
+            placeholder="GitHub Repository URL"
+            value={newProject.repositoryLink}
+            onChange={handleInputChange}
+          />
+          <TextField
+            type="text"
+            name="language"
+            placeholder="Language"
+            value={newProject.language}
+            onChange={handleInputChange}
+          />
           <Button variant="contained" onClick={createProject}>Create</Button>
         </Stack>
         <GithubRepoFetcher setProjectDetails={setProjectDetails} />
@@ -203,6 +217,22 @@ const App = () => {
             onChange={handleEditChange}
             margin="dense"
           />
+          <TextField
+            label="GitHub Repository URL"
+            fullWidth
+            name="repositoryLink"
+            value={editProject?.repositoryLink || ""}
+            onChange={handleEditChange}
+            margin="dense"
+          />
+          <TextField
+            label="Language"
+            fullWidth
+            name="language"
+            value={editProject?.language || ""}
+            onChange={handleEditChange}
+            margin="dense"
+          />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="secondary">Cancel</Button>
@@ -225,6 +255,8 @@ const App = () => {
             }}>
               <Typography variant="h6">{project.name}</Typography>
               <Typography variant="body2">{project.description}</Typography>
+              <Typography variant="body2">URL: <a href={project.repositoryLink} target="_blank" rel="noopener noreferrer">{project.repositoryLink}</a></Typography>
+              <Typography variant="body2">Language: {project.language}</Typography>
               <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
                 <Button variant="outlined" color="primary" size="small" onClick={() => handleEditClick(project)}>Edit</Button>
                 <Button variant="outlined" color="error" size="small" onClick={() => deleteProject(project.id)}>Delete</Button>

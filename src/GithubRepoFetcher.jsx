@@ -39,7 +39,12 @@ const GithubRepoFetcher = ({ setProjectDetails }) => {
       const data = await response.json();
 
       // Set the project details with the fetched data
-      setProjectDetails({ name: data.full_name, description: data.description });
+      setProjectDetails({ 
+      name: data.full_name, 
+      description: data.description,
+      html_url: data.html_url,
+      language: data.language,
+    });
       setError(null);
     } catch (error) {
       // Set an error message if the fetch fails
