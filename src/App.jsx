@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Stack, CssBaseline, Container, Typography, TextField, Button, Box, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import GithubRepoFetcher from './GithubRepoFetcher';
 import { Masonry } from '@mui/lab';
+import ScrollToTop from './ScrollToTop';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -143,9 +144,7 @@ const App = () => {
 
   const filteredProjects = projects.filter(project =>
     project.name && project.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-  
-  
+  );  
 
   return (
     <Container maxWidth={false} sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column" }}>
@@ -265,6 +264,7 @@ const App = () => {
           ))}
         </Masonry>
       </Box>
+      <ScrollToTop />
     </Container>
   );
 };
