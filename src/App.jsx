@@ -19,6 +19,7 @@ const App = () => {
   const [editProject, setEditProject] = useState(null);
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState(""); // State for the search query
+  const [isSorted, setIsSorted] = useState(false); // State to manage sorting
 
   /**
    * useEffect hook to fetch projects when the component mounts.
@@ -146,6 +147,16 @@ const App = () => {
     project.name && project.name.toLowerCase().includes(searchQuery.toLowerCase())
   );  
 
+  // Sorts projects if true
+  const sortedProjects = isSorted
+    ? filteredProjects.sort((a, b) => a.name.localeCompare(b.name))
+    : filteredProjects;
+
+  // Changes the sorting method
+  const toggleSort = () => {
+    setIsSorted(!isSorted);
+  };
+
   return (
     <Container maxWidth={false} sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column" }}>
       <CssBaseline />
@@ -239,10 +250,17 @@ const App = () => {
         </DialogActions>
       </Dialog>
 
+      {/* Sorting button */}
+      <Box sx={{ mt: 2 }}>
+        <Button variant="outlined" onClick={toggleSort}>
+          {isSorted ? "Sort By Default" : "Sort By Name"}
+        </Button>
+      </Box>
+
       <Box sx={{ mt: 5, width: '80%' }}>
         <Typography variant="h4">Project List</Typography>
         <Masonry columns={3} spacing={2}>
-          {filteredProjects.map((project) => (
+          {sortedProjects.map((project) => (
             <Box key={project.id} sx={{
               border: '1px solid #ddd',
               padding: 2,
