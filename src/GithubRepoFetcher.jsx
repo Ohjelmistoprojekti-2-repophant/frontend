@@ -62,7 +62,9 @@ const GithubRepoFetcher = ({ setProjectDetails }) => {
           onChange={(e) => setRepoUrl(e.target.value)}
           fullWidth
         />
-        <Button variant="contained" onClick={fetchRepoDetails}>Fetch & Fill Fields</Button>
+        <Button variant="contained" name="fetchButton" onClick={fetchRepoDetails}>
+          Fetch & Fill Fields
+        </Button>
       </Stack>
       {error && (
         <Typography variant="body1" color="error" sx={{ mt: 3 }}>

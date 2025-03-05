@@ -192,7 +192,9 @@ const App = () => {
             value={newProject.language}
             onChange={handleInputChange}
           />
-          <Button variant="contained" onClick={createProject}>Create</Button>
+          <Button variant="contained" name="createButton" onClick={createProject}>
+            Create
+          </Button>
         </Stack>
         <GithubRepoFetcher setProjectDetails={setProjectDetails} />
       </Box>
