@@ -9,11 +9,14 @@ Add New Project
     Input Text    name=repositoryLink    https://github.com/your-repository
     Input Text    name=language    Ruby
     Click Element    name=createButton
+    Sleep               1s
     Page Should Contain     Projects
     Page Should Contain     Test Name
 
 Add New Project By Link
-    Input Text    id=:rb:    https://github.com/Ohjelmistoprojekti-2-repophant/backend
+    Input Text    repositoryFetchInput    https://github.com/Ohjelmistoprojekti-2-repophant/backend
     Click Element    name=fetchButton
     Sleep               1s
-    Click Element    xpath=//button[normalize-space(text())='Create']
+    Click Element    name=createButton
+    Sleep               1s
+    Page Should Contain     Ohjelmistoprojekti-2-repophant/backend
