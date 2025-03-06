@@ -57,6 +57,7 @@ const GithubRepoFetcher = ({ setProjectDetails }) => {
       <Stack direction="row" spacing={2} sx={{ mt: 3 }}>
         <TextField
           type="text"
+          name="repositoryFetchInput"
           placeholder="GitHub Repository URL"
           value={repoUrl}
           onChange={(e) => setRepoUrl(e.target.value)}
