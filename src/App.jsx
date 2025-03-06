@@ -202,6 +202,7 @@ const App = () => {
       {/* Edit project modal */}
       <Box sx={{ mt: 3 }}>
         <TextField
+          name="repositorySearchBar"
           placeholder="Search Projects By Name"
           variant="outlined"
           fullWidth
@@ -259,7 +260,7 @@ const App = () => {
         </Button>
       </Box>
 
-      <Box sx={{ mt: 5, width: '80%' }}>
+      <Box id="project-box" sx={{ mt: 5, width: '80%' }}>
         <Typography variant="h4">Project List</Typography>
         <Masonry columns={3} spacing={2}>
           {sortedProjects.map((project) => (
