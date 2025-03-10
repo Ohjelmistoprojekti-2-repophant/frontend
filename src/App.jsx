@@ -42,10 +42,10 @@ const App = () => {
     }
   };
 
-   /**
-   * Creates a new project and adds it to the projects state and the API.
-   * Logs an error message if the creation fails.
-   */
+  /**
+  * Creates a new project and adds it to the projects state and the API.
+  * Logs an error message if the creation fails.
+  */
   const createProject = async () => {
     try {
       const response = await fetch(`${apiUrl}/api/projects`, {
@@ -145,7 +145,7 @@ const App = () => {
 
   const filteredProjects = projects.filter(project =>
     project.name && project.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );  
+  );
 
   // Sorts projects if true
   const sortedProjects = isSorted
@@ -158,37 +158,39 @@ const App = () => {
   };
 
   return (
-    <Container maxWidth={false} sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column" }}>
+    <Container maxWidth={false} sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column", mt: 2 }}>
       <CssBaseline />
       <Box>
-        <Typography variant="h2">Projects</Typography>
-        <Typography variant="h5">Create new Project</Typography>
+        <Stack sx={{ display: "flex", alignItems: "center" }}>
+          <Typography variant="h2">Projects</Typography>
+          <Typography variant="h5">Create new Project</Typography>
+        </Stack>
         <Stack direction="row" spacing={2} sx={{ mt: 3 }}>
           <TextField
             type="text"
+            label="Name"
             name="name"
-            placeholder="Name"
             value={newProject.name}
             onChange={handleInputChange}
           />
           <TextField
             type="text"
+            label="Description"
             name="description"
-            placeholder="Description"
             value={newProject.description}
             onChange={handleInputChange}
           />
           <TextField
             type="text"
+            label="GitHub Repository URL"
             name="repositoryLink"
-            placeholder="GitHub Repository URL"
             value={newProject.repositoryLink}
             onChange={handleInputChange}
           />
           <TextField
             type="text"
+            label="Language"
             name="language"
-            placeholder="Language"
             value={newProject.language}
             onChange={handleInputChange}
           />
@@ -200,10 +202,10 @@ const App = () => {
       </Box>
 
       {/* Edit project modal */}
-      <Box sx={{ mt: 3 }}>
+      <Box sx={{ mt: 3, width: 230}}>
         <TextField
           name="repositorySearchBar"
-          placeholder="Search Projects By Name"
+          label="Search Projects By Name"
           variant="outlined"
           fullWidth
           value={searchQuery}
@@ -261,29 +263,32 @@ const App = () => {
       </Box>
 
       <Box id="project-box" sx={{ mt: 5, width: '80%' }}>
-        <Typography variant="h4">Project List</Typography>
-        <Masonry columns={3} spacing={2}>
-          {sortedProjects.map((project) => (
-            <Box key={project.id} sx={{
-              border: '1px solid #ddd',
-              padding: 2,
-              borderRadius: 1,
-              display: 'flex',
-              flexDirection: 'column',
-              overflow: 'hidden', // Hide anything overflowing the container
-              wordWrap: 'break-word' // Prevent long words from overflowing
-            }}>
-              <Typography variant="h6">{project.name}</Typography>
-              <Typography variant="body2">{project.description}</Typography>
-              <Typography variant="body2">URL: <a href={project.repositoryLink} target="_blank" rel="noopener noreferrer">{project.repositoryLink}</a></Typography>
-              <Typography variant="body2">Language: {project.language}</Typography>
-              <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
-                <Button variant="outlined" color="primary" size="small" onClick={() => handleEditClick(project)}>Edit</Button>
-                <Button variant="outlined" color="error" size="small" onClick={() => deleteProject(project.id)}>Delete</Button>
-              </Stack>
-            </Box>
-          ))}
-        </Masonry>
+        <Stack spacing={1} sx={{ display: "flex", alignItems: "center" }}>
+          <Typography variant="h4">Project List</Typography>
+          <Masonry columns={3} spacing={2}>
+            {sortedProjects.map((project) => (
+              <Box key={project.id} sx={{
+                border: '1px solid #ddd',
+                padding: 2,
+                borderRadius: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                overflow: 'hidden', // Hide anything overflowing the container
+                wordWrap: 'break-word' // Prevent long words from overflowing
+              }}>
+                <Typography variant="h6">{project.name}</Typography>
+                <Typography variant="body2">{project.description}</Typography>
+                <Typography variant="body2">URL: <a href={project.repositoryLink} target="_blank" rel="noopener noreferrer">{project.repositoryLink}</a></Typography>
+                <Typography variant="body2">Language: {project.language}</Typography>
+                <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
+                  <Button variant="outlined" color="primary" size="small" onClick={() => handleEditClick(project)}>Edit</Button>
+                  <Button variant="outlined" color="error" size="small" onClick={() => deleteProject(project.id)}>Delete</Button>
+                </Stack>
+              </Box>
+            ))}
+          </Masonry>
+        </Stack>
+
       </Box>
       <ScrollToTop />
     </Container>
