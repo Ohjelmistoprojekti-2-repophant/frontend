@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+#Robot Framework
+robot/*.html
+robot/*.xml
+robot/*.png
