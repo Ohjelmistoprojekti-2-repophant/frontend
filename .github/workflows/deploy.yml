@@ -29,6 +29,6 @@ jobs:
         run: npm run build
 
       - name: Deploy to Github Pages
-        run: npm run dist
+        run: gh-pages -d dist
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
