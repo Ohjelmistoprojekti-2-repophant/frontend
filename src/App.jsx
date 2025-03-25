@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Stack, CssBaseline, Container, Typography, TextField, Button, Box, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { Stack, CssBaseline, Container, Typography, TextField, Button, Box, Dialog, DialogTitle, DialogContent, DialogActions, createTheme, ThemeProvider, FormControlLabel, Switch } from '@mui/material';
 import GithubRepoFetcher from './GithubRepoFetcher';
 import { Masonry } from '@mui/lab';
 import ScrollToTop from './ScrollToTop';
@@ -20,6 +20,7 @@ const App = () => {
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState(""); // State for the search query
   const [isSorted, setIsSorted] = useState(false); // State to manage sorting
+  const [mode, setMode] = useState("light");
 
   /**
    * useEffect hook to fetch projects when the component mounts.
@@ -157,141 +158,150 @@ const App = () => {
     setIsSorted(!isSorted);
   };
 
+  const darkTheme = createTheme({
+    palette: {
+      mode: mode,
+    },
+  });
+
   return (
-    <Container maxWidth={false} sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column", mt: 2 }}>
-      <CssBaseline />
-      <Box>
-        <Stack sx={{ display: "flex", alignItems: "center" }}>
-          <Typography variant="h2">Projects</Typography>
-          <Typography variant="h5">Create new Project</Typography>
-        </Stack>
-        <Stack direction="row" spacing={2} sx={{ mt: 3 }}>
+    <ThemeProvider theme={darkTheme}>
+      <FormControlLabel control={<Switch />} label="dark mode" onChange={e => setMode(mode === "light" ? "dark" : "light")}/>
+      <Container maxWidth={false} sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column", mt: 2 }}>
+        <CssBaseline />
+        <Box>
+          <Stack sx={{ display: "flex", alignItems: "center" }}>
+            <Typography variant="h2">Projects</Typography>
+            <Typography variant="h5">Create new Project</Typography>
+          </Stack>
+          <Stack direction="row" spacing={2} sx={{ mt: 3 }}>
+            <TextField
+              type="text"
+              label="Name"
+              name="name"
+              value={newProject.name}
+              onChange={handleInputChange}
+            />
+            <TextField
+              type="text"
+              label="Description"
+              name="description"
+              value={newProject.description}
+              onChange={handleInputChange}
+            />
+            <TextField
+              type="text"
+              label="GitHub Repository URL"
+              name="repositoryLink"
+              value={newProject.repositoryLink}
+              onChange={handleInputChange}
+            />
+            <TextField
+              type="text"
+              label="Language"
+              name="language"
+              value={newProject.language}
+              onChange={handleInputChange}
+            />
+            <Button variant="contained" name="createButton" onClick={createProject}>
+              Create
+            </Button>
+          </Stack>
+          <GithubRepoFetcher setProjectDetails={setProjectDetails} />
+        </Box>
+
+        {/* Edit project modal */}
+        <Box sx={{ mt: 3, width: 230 }}>
           <TextField
-            type="text"
-            label="Name"
-            name="name"
-            value={newProject.name}
-            onChange={handleInputChange}
+            name="repositorySearchBar"
+            label="Search Projects By Name"
+            variant="outlined"
+            fullWidth
+            value={searchQuery}
+            onChange={handleSearchChange}
           />
-          <TextField
-            type="text"
-            label="Description"
-            name="description"
-            value={newProject.description}
-            onChange={handleInputChange}
-          />
-          <TextField
-            type="text"
-            label="GitHub Repository URL"
-            name="repositoryLink"
-            value={newProject.repositoryLink}
-            onChange={handleInputChange}
-          />
-          <TextField
-            type="text"
-            label="Language"
-            name="language"
-            value={newProject.language}
-            onChange={handleInputChange}
-          />
-          <Button variant="contained" name="createButton" onClick={createProject}>
-            Create
+        </Box>
+
+        <Dialog open={open} onClose={handleClose}>
+          <DialogTitle>Edit Project</DialogTitle>
+          <DialogContent>
+            <TextField
+              label="Name"
+              fullWidth
+              name="name"
+              value={editProject?.name || ""}
+              onChange={handleEditChange}
+              margin="dense"
+            />
+            <TextField
+              label="Description"
+              fullWidth
+              name="description"
+              value={editProject?.description || ""}
+              onChange={handleEditChange}
+              margin="dense"
+            />
+            <TextField
+              label="GitHub Repository URL"
+              fullWidth
+              name="repositoryLink"
+              value={editProject?.repositoryLink || ""}
+              onChange={handleEditChange}
+              margin="dense"
+            />
+            <TextField
+              label="Language"
+              fullWidth
+              name="language"
+              value={editProject?.language || ""}
+              onChange={handleEditChange}
+              margin="dense"
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose} color="secondary">Cancel</Button>
+            <Button onClick={handleSave} color="primary">Save</Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Sorting button */}
+        <Box sx={{ mt: 2 }}>
+          <Button variant="outlined" onClick={toggleSort}>
+            {isSorted ? "Sort By Default" : "Sort By Name"}
           </Button>
-        </Stack>
-        <GithubRepoFetcher setProjectDetails={setProjectDetails} />
-      </Box>
+        </Box>
 
-      {/* Edit project modal */}
-      <Box sx={{ mt: 3, width: 230}}>
-        <TextField
-          name="repositorySearchBar"
-          label="Search Projects By Name"
-          variant="outlined"
-          fullWidth
-          value={searchQuery}
-          onChange={handleSearchChange}
-        />
-      </Box>
+        <Box id="project-box" sx={{ mt: 5, width: '80%' }}>
+          <Stack spacing={1} sx={{ display: "flex", alignItems: "center" }}>
+            <Typography variant="h4">Project List</Typography>
+            <Masonry columns={3} spacing={2}>
+              {sortedProjects.map((project) => (
+                <Box key={project.id} sx={{
+                  border: '1px solid #ddd',
+                  padding: 2,
+                  borderRadius: 1,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  overflow: 'hidden', // Hide anything overflowing the container
+                  wordWrap: 'break-word' // Prevent long words from overflowing
+                }}>
+                  <Typography variant="h6">{project.name}</Typography>
+                  <Typography variant="body2">{project.description}</Typography>
+                  <Typography variant="body2">URL: <a href={project.repositoryLink} target="_blank" rel="noopener noreferrer">{project.repositoryLink}</a></Typography>
+                  <Typography variant="body2">Language: {project.language}</Typography>
+                  <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
+                    <Button variant="outlined" color="primary" size="small" onClick={() => handleEditClick(project)}>Edit</Button>
+                    <Button variant="outlined" color="error" size="small" onClick={() => deleteProject(project.id)}>Delete</Button>
+                  </Stack>
+                </Box>
+              ))}
+            </Masonry>
+          </Stack>
 
-      <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Edit Project</DialogTitle>
-        <DialogContent>
-          <TextField
-            label="Name"
-            fullWidth
-            name="name"
-            value={editProject?.name || ""}
-            onChange={handleEditChange}
-            margin="dense"
-          />
-          <TextField
-            label="Description"
-            fullWidth
-            name="description"
-            value={editProject?.description || ""}
-            onChange={handleEditChange}
-            margin="dense"
-          />
-          <TextField
-            label="GitHub Repository URL"
-            fullWidth
-            name="repositoryLink"
-            value={editProject?.repositoryLink || ""}
-            onChange={handleEditChange}
-            margin="dense"
-          />
-          <TextField
-            label="Language"
-            fullWidth
-            name="language"
-            value={editProject?.language || ""}
-            onChange={handleEditChange}
-            margin="dense"
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose} color="secondary">Cancel</Button>
-          <Button onClick={handleSave} color="primary">Save</Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Sorting button */}
-      <Box sx={{ mt: 2 }}>
-        <Button variant="outlined" onClick={toggleSort}>
-          {isSorted ? "Sort By Default" : "Sort By Name"}
-        </Button>
-      </Box>
-
-      <Box id="project-box" sx={{ mt: 5, width: '80%' }}>
-        <Stack spacing={1} sx={{ display: "flex", alignItems: "center" }}>
-          <Typography variant="h4">Project List</Typography>
-          <Masonry columns={3} spacing={2}>
-            {sortedProjects.map((project) => (
-              <Box key={project.id} sx={{
-                border: '1px solid #ddd',
-                padding: 2,
-                borderRadius: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                overflow: 'hidden', // Hide anything overflowing the container
-                wordWrap: 'break-word' // Prevent long words from overflowing
-              }}>
-                <Typography variant="h6">{project.name}</Typography>
-                <Typography variant="body2">{project.description}</Typography>
-                <Typography variant="body2">URL: <a href={project.repositoryLink} target="_blank" rel="noopener noreferrer">{project.repositoryLink}</a></Typography>
-                <Typography variant="body2">Language: {project.language}</Typography>
-                <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
-                  <Button variant="outlined" color="primary" size="small" onClick={() => handleEditClick(project)}>Edit</Button>
-                  <Button variant="outlined" color="error" size="small" onClick={() => deleteProject(project.id)}>Delete</Button>
-                </Stack>
-              </Box>
-            ))}
-          </Masonry>
-        </Stack>
-
-      </Box>
-      <ScrollToTop />
-    </Container>
+        </Box>
+        <ScrollToTop />
+      </Container>
+    </ThemeProvider>
   );
 };
 
