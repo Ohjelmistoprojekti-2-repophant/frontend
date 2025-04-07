@@ -3,6 +3,7 @@ import { Stack, CssBaseline, Container, Typography, TextField, Button, Box, Dial
 import GithubRepoFetcher from './GithubRepoFetcher';
 import { Masonry } from '@mui/lab';
 import ScrollToTop from './ScrollToTop';
+import axios from 'axios';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -21,6 +22,7 @@ const App = () => {
   const [searchQuery, setSearchQuery] = useState(""); // State for the search query
   const [isSorted, setIsSorted] = useState(false); // State to manage sorting
   const [mode, setMode] = useState("light");
+  const [user, setUser] = useState(null);
 
   /**
    * useEffect hook to fetch projects when the component mounts.
@@ -164,9 +166,28 @@ const App = () => {
     },
   });
 
+  const githubLogin = () => {
+    window.location.href = `${apiUrl}/oauth2/authorization/github`;
+  }
+
+  useEffect(() => {
+    axios.get(`${apiUrl}/api/user-info`, {withCredentials:true})
+      .then(response => {
+        setUser(response.data);
+      })
+      .catch(error => {
+        console.error('Error occured: ', error);
+      })
+  }, []);
+
   return (
     <ThemeProvider theme={darkTheme}>
       <FormControlLabel control={<Switch />} label="dark mode" onChange={e => setMode(mode === "light" ? "dark" : "light")}/>
+      {user ? (
+        <div>Welcome, {user.name}</div>
+      ) : (
+        <Button onClick={githubLogin}>Login with GitHub</Button>
+      )}
       <Container maxWidth={false} sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column", mt: 2 }}>
         <CssBaseline />
         <Box>
