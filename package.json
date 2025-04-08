@@ -12,7 +12,7 @@
     "test:robot": "robot --outputdir=robot/ robot/",
     "test": "start-server-and-test test:vite http://localhost:5173 test:robot",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build",
+    "deploy": "gh-pages -d dist",
     "test:vite": "vite",
     "test:robot": "robot --outputdir=robot/ robot/",
     "test": "start-server-and-test test:vite http://localhost:5173 test:robot"
@@ -38,7 +38,6 @@
     "eslint-plugin-react-refresh": "^0.4.16",
     "gh-pages": "^6.3.0",
     "globals": "^15.14.0",
-    "start-server-and-test": "^2.0.10",
     "vite": "^6.0.5"
   }
 }
