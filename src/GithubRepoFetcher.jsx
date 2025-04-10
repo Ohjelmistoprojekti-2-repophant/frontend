@@ -44,6 +44,7 @@ const GithubRepoFetcher = ({ setProjectDetails }) => {
       description: data.description,
       html_url: data.html_url,
       language: data.language,
+      created_at: data.created_at,
     });
       setError(null);
     } catch (error) {
