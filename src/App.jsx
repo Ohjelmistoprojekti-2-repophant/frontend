@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Stack, CssBaseline, Container, Typography, TextField, Button, Box, Dialog, DialogTitle, DialogContent, DialogActions, createTheme, ThemeProvider, FormControlLabel, Switch } from '@mui/material';
 import GithubRepoFetcher from './GithubRepoFetcher';
 import { Masonry } from '@mui/lab';
@@ -16,11 +16,11 @@ const apiUrl = import.meta.env.VITE_API_URL;
  */
 const App = () => {
   const [projects, setProjects] = useState([]);
-  const [newProject, setNewProject] = useState({ name: '', description: '', repositoryLink: '', language: '' });
+  const [newProject, setNewProject] = useState({ name: '', description: '', repositoryLink: '', language: '', createdAt: '' });
   const [editProject, setEditProject] = useState(null);
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState(""); // State for the search query
-  const [isSorted, setIsSorted] = useState(false); // State to manage sorting
+  const [sortMode, setSortMode] = useState("default"); // State to manage sort mode
   const [mode, setMode] = useState("light");
   const [user, setUser] = useState(null);
 
@@ -60,7 +60,7 @@ const App = () => {
       });
       const data = await response.json();
       setProjects([...projects, data]);
-      setNewProject({ name: '', description: '', repositoryLink: '', language: '' });
+      setNewProject({ name: '', description: '', repositoryLink: '', language: '', createdAt: '' });
     } catch (error) {
       console.error('Error creating project:', error);
     }
@@ -97,7 +97,7 @@ const App = () => {
    * @param {Object} projectDetails - The project details.
    */
   const setProjectDetails = (projectDetails) => {
-    setNewProject({ ...projectDetails, repositoryLink: projectDetails.html_url });
+    setNewProject({ ...projectDetails, repositoryLink: projectDetails.html_url, createdAt: projectDetails.created_at });
   };
 
   /**
@@ -146,18 +146,36 @@ const App = () => {
     setSearchQuery(event.target.value);
   };
 
-  const filteredProjects = projects.filter(project =>
+  const sortedProjects = useMemo(() => {
+    return [...projects].sort((a, b) =>
+      sortMode === "name"
+        ? a.name.localeCompare(b.name)
+        : sortMode === "newest"
+        ? new Date(b.createdAt) - new Date(a.createdAt)
+        : sortMode === "oldest"
+        ? new Date(a.createdAt) - new Date(b.createdAt)
+        : 0
+    );
+  }, [projects, sortMode]);
+
+  // Filters the sorted projects based on the search query
+const filteredProjects = useMemo(() => {
+  return sortedProjects.filter(project =>
     project.name && project.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
-  // Sorts projects if true
-  const sortedProjects = isSorted
-    ? filteredProjects.sort((a, b) => a.name.localeCompare(b.name))
-    : filteredProjects;
+}, [sortedProjects, searchQuery]);
 
   // Changes the sorting method
   const toggleSort = () => {
-    setIsSorted(!isSorted);
+    setSortMode(
+      sortMode === "default"
+        ? "name"
+        : sortMode === "name"
+        ? "newest"
+        : sortMode === "newest"
+        ? "oldest"
+        : "default"
+    );
   };
 
   const darkTheme = createTheme({
@@ -224,6 +242,13 @@ const App = () => {
               value={newProject.language}
               onChange={handleInputChange}
             />
+            <TextField
+              type="text"
+              label="Created At"
+              name="createdAt"
+              value={newProject.createdAt}
+              onChange={handleInputChange}
+            />
             <Button variant="contained" name="createButton" onClick={createProject}>
               Create
             </Button>
@@ -278,6 +303,13 @@ const App = () => {
               onChange={handleEditChange}
               margin="dense"
             />
+            <TextField
+              label="Created At"
+              fullWidth
+              name="createdAt"
+              onChange={handleEditChange}
+              margin="dense"
+            />
           </DialogContent>
           <DialogActions>
             <Button onClick={handleClose} color="secondary">Cancel</Button>
@@ -288,7 +320,10 @@ const App = () => {
         {/* Sorting button */}
         <Box sx={{ mt: 2 }}>
           <Button variant="outlined" onClick={toggleSort}>
-            {isSorted ? "Sort By Default" : "Sort By Name"}
+            {sortMode === "default" && "Click to Sort Alphabetically"}
+            {sortMode === "name" && "Click to Sort By Newest"}
+            {sortMode === "newest" && "Click to Sort By Oldest"}
+            {sortMode === "oldest" && "Clear Sorting"}
           </Button>
         </Box>
 
@@ -296,7 +331,7 @@ const App = () => {
           <Stack spacing={1} sx={{ display: "flex", alignItems: "center" }}>
             <Typography variant="h4">Project List</Typography>
             <Masonry columns={3} spacing={2}>
-              {sortedProjects.map((project) => (
+              {filteredProjects.map((project) => (
                 <Box key={project.id} sx={{
                   border: '1px solid #ddd',
                   padding: 2,
@@ -310,6 +345,7 @@ const App = () => {
                   <Typography variant="body2">{project.description}</Typography>
                   <Typography variant="body2">URL: <a href={project.repositoryLink} target="_blank" rel="noopener noreferrer">{project.repositoryLink}</a></Typography>
                   <Typography variant="body2">Language: {project.language}</Typography>
+                  <Typography variant="body2">Created At: {new Date(project.createdAt).toLocaleDateString()}</Typography>
                   <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
                     <Button variant="outlined" color="primary" size="small" onClick={() => handleEditClick(project)}>Edit</Button>
                     <Button variant="outlined" color="error" size="small" onClick={() => deleteProject(project.id)}>Delete</Button>
