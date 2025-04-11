@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Stack, CssBaseline, Container, Typography, TextField, Button, Box, Dialog, DialogTitle, DialogContent, DialogActions, createTheme, ThemeProvider, FormControlLabel, Switch } from '@mui/material';
 import GithubRepoFetcher from './GithubRepoFetcher';
+import GithubProfileAnalyzer from './GithubProfileAnalyzer';
 import { Masonry } from '@mui/lab';
 import ScrollToTop from './ScrollToTop';
 import axios from 'axios';
@@ -202,7 +203,10 @@ const filteredProjects = useMemo(() => {
     <ThemeProvider theme={darkTheme}>
       <FormControlLabel control={<Switch />} label="dark mode" onChange={e => setMode(mode === "light" ? "dark" : "light")}/>
       {user ? (
-        <div>Welcome, {user.name}</div>
+        <Box sx={{ p: 2 }}>
+          <Typography variant="h6">Welcome, {user.name}</Typography>
+          <GithubProfileAnalyzer />
+        </Box>
       ) : (
         <Button onClick={githubLogin}>Login with GitHub</Button>
       )}
