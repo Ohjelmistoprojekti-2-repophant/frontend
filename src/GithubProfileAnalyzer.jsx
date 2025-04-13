@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import PropTypes from 'prop-types'
+import PropTypes from 'prop-types';
 import {
 	Box,
 	Typography,
@@ -57,7 +57,8 @@ const analyzeRepository = (repo, analysis) => {
 
 const checkDevelopmentPractices = (files, analysis) => {
 	if (files.includes('readme.md')) analysis.practices.hasReadme++;
-	if (files.some((file) => file.includes('test'))) analysis.practices.hasTests++;
+	if (files.some((file) => file.includes('test')))
+		analysis.practices.hasTests++;
 	return analysis;
 };
 
@@ -95,7 +96,11 @@ const GithubProfileAnalyzer = () => {
 			for (const repo of reposResponse.data) {
 				analysis = analyzeRepository(repo, analysis);
 
-				const files = await fetchRepositoryContents(targetUsername, repo.name, token);
+				const files = await fetchRepositoryContents(
+					targetUsername,
+					repo.name,
+					token
+				);
 				analysis = checkDevelopmentPractices(files, analysis);
 			}
 
@@ -104,7 +109,9 @@ const GithubProfileAnalyzer = () => {
 				technologies: Array.from(analysis.technologies),
 			});
 		} catch {
-			setError('Failed to analyze profile. Please check if the username is correct and try again.');
+			setError(
+				'Failed to analyze profile. Please check if the username is correct and try again.'
+			);
 		} finally {
 			setLoading(false);
 		}
@@ -160,13 +167,19 @@ const GithubProfileAnalyzer = () => {
 					<ListItemText primary="Total Projects" secondary={projects.total} />
 				</ListItem>
 				<ListItem>
-					<ListItemText primary="Personal Projects" secondary={projects.personal} />
+					<ListItemText
+						primary="Personal Projects"
+						secondary={projects.personal}
+					/>
 				</ListItem>
 				<ListItem>
 					<ListItemText primary="Forked Projects" secondary={projects.forked} />
 				</ListItem>
 				<ListItem>
-					<ListItemText primary="Archived Projects" secondary={projects.archived} />
+					<ListItemText
+						primary="Archived Projects"
+						secondary={projects.archived}
+					/>
 				</ListItem>
 			</List>
 		</Box>
