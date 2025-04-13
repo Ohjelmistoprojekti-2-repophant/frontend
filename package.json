@@ -11,11 +11,10 @@
     "test:vite": "vite",
     "test:robot": "robot --outputdir=robot/ robot/",
     "test": "start-server-and-test test:vite http://localhost:5173 test:robot",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist",
-    "test:vite": "vite",
-    "test:robot": "robot --outputdir=robot/ robot/",
-    "test": "start-server-and-test test:vite http://localhost:5173 test:robot"
+    "start": "vite preview --port $PORT",
+    "render-build": "npm run build",
+    "format": "prettier --write \"src/**/*.{js,jsx}\"",
+    "format:check": "prettier --check \"src/**/*.{js,jsx}\""
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -24,6 +23,7 @@
     "@mui/material": "^6.4.3",
     "axios": "^1.8.4",
     "frontend": "file:",
+    "prop-types": "^15.8.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
@@ -34,10 +34,8 @@
     "@vitejs/plugin-react": "^4.3.4",
     "eslint": "^9.17.0",
     "eslint-plugin-react": "^7.37.2",
-    "eslint-plugin-react-hooks": "^5.0.0",
-    "eslint-plugin-react-refresh": "^0.4.16",
-    "gh-pages": "^6.3.0",
     "globals": "^15.14.0",
+    "prettier": "^3.5.3",
     "vite": "^6.0.5"
   }
 }
