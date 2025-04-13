@@ -76,7 +76,13 @@ const App = () => {
 			});
 			const data = await response.json();
 			setProjects([...projects, data]);
-			setNewProject({ name: '', description: '', repositoryLink: '', language: '', createdAt: '' });
+			setNewProject({
+				name: '',
+				description: '',
+				repositoryLink: '',
+				language: '',
+				createdAt: '',
+			});
 		} catch (error) {
 			console.error('Error creating project:', error);
 		}
@@ -155,7 +161,9 @@ const App = () => {
 				body: JSON.stringify(editProject),
 			});
 
-			setProjects(projects.map((p) => (p.id === editProject.id ? editProject : p)));
+			setProjects(
+				projects.map((p) => (p.id === editProject.id ? editProject : p))
+			);
 			handleClose();
 		} catch (error) {
 			console.error('Error updating project:', error);
@@ -181,7 +189,9 @@ const App = () => {
 	// Filters the sorted projects based on the search query
 	const filteredProjects = useMemo(() => {
 		return sortedProjects.filter(
-			(project) => project.name && project.name.toLowerCase().includes(searchQuery.toLowerCase())
+			(project) =>
+				project.name &&
+				project.name.toLowerCase().includes(searchQuery.toLowerCase())
 		);
 	}, [sortedProjects, searchQuery]);
 
@@ -286,7 +296,11 @@ const App = () => {
 							value={newProject.createdAt}
 							onChange={handleInputChange}
 						/>
-						<Button variant="contained" name="createButton" onClick={createProject}>
+						<Button
+							variant="contained"
+							name="createButton"
+							onClick={createProject}
+						>
 							Create
 						</Button>
 					</Stack>
@@ -389,13 +403,20 @@ const App = () => {
 									<Typography variant="body2">{project.description}</Typography>
 									<Typography variant="body2">
 										URL:{' '}
-										<a href={project.repositoryLink} target="_blank" rel="noopener noreferrer">
+										<a
+											href={project.repositoryLink}
+											target="_blank"
+											rel="noopener noreferrer"
+										>
 											{project.repositoryLink}
 										</a>
 									</Typography>
-									<Typography variant="body2">Language: {project.language}</Typography>
 									<Typography variant="body2">
-										Created At: {new Date(project.createdAt).toLocaleDateString()}
+										Language: {project.language}
+									</Typography>
+									<Typography variant="body2">
+										Created At:{' '}
+										{new Date(project.createdAt).toLocaleDateString()}
 									</Typography>
 									<Stack direction="row" spacing={1} sx={{ mt: 2 }}>
 										<Button

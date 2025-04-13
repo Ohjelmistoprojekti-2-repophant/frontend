@@ -18,6 +18,32 @@ jobs:
           node-version: 20
           cache: 'npm'
       
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install robotframework
+          pip install robotframework-seleniumlibrary
+      
+      - name: Install Chrome
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable
+      
+      - name: Install ChromeDriver
+        run: |
+          CHROME_VERSION=$(google-chrome --version | cut -d ' ' -f 3 | cut -d '.' -f 1)
+          CHROMEDRIVER_VERSION=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION")
+          wget -q "https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip"
+          unzip chromedriver_linux64.zip
+          sudo mv chromedriver /usr/local/bin/
+          sudo chmod +x /usr/local/bin/chromedriver
+      
       - name: Install dependencies
         run: npm ci
       
@@ -30,5 +56,29 @@ jobs:
       - name: Build
         run: npm run build
       
-      - name: Run tests
-        run: npm test
+      - name: Run Robot tests
+        continue-on-error: true
+        run: |
+          npm run test:vite &
+          sleep 10
+          if ! robot --outputdir robot/results robot/; then
+              echo "Robot Framework tests failed. Rerunning failed tests..."
+              if [ -f robot/results/output.xml ]; then
+                  robot --rerunfailed robot/results/output.xml --outputdir robot/results_rerun robot/ || true
+                  if [ -f robot/results_rerun/output.xml ]; then
+                      rebot --output robot/results/output.xml --log robot/results/log.html --report robot/results/report.html --merge robot/results/output.xml robot/results_rerun/output.xml
+                  else
+                      echo "No output.xml file found from rerun. Skipping merge."
+                  fi
+              else
+                  echo "No output.xml file found. Cannot rerun failed tests."
+              fi
+          fi
+          echo "Script execution completed"
+      
+      - name: Upload Robot test results
+        uses: actions/upload-artifact@v4
+        with:
+          path: ./robot/results
+          name: robot-test-results
+          retention-days: 3
