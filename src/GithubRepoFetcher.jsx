@@ -14,6 +14,7 @@ import { TextField, Button, Typography, Box, Stack } from '@mui/material';
 const GithubRepoFetcher = ({ setProjectDetails }) => {
 	const [repoUrl, setRepoUrl] = useState('');
 	const [error, setError] = useState(null);
+	const [lastCommitDate, setLastCommitDate] = useState(null);
 
 	/**
 	 * Fetches the details of a GitHub repository from the provided URL.
@@ -37,6 +38,19 @@ const GithubRepoFetcher = ({ setProjectDetails }) => {
 				throw new Error('Repository not found');
 			}
 			const data = await response.json();
+
+			// Fetch the last commit date
+			const commitsResponse = await fetch(
+				`https://api.github.com/repos/${repoPath}/commits?per_page=1`
+			);
+			if (commitsResponse.ok) {
+				const commitsData = await commitsResponse.json();
+				if (commitsData.length > 0) {
+					setLastCommitDate(
+						new Date(commitsData[0].commit.author.date).toLocaleDateString('fi-FI')
+					);
+				}
+			}
 
 			// Set the project details with the fetched data
 			setProjectDetails({
@@ -75,6 +89,11 @@ const GithubRepoFetcher = ({ setProjectDetails }) => {
 			{error && (
 				<Typography variant="body1" color="error" sx={{ mt: 3 }}>
 					{error}
+				</Typography>
+			)}
+			{lastCommitDate && (
+				<Typography variant="body1" sx={{ mt: 2 }}>
+					Last Commit: {lastCommitDate}
 				</Typography>
 			)}
 		</Box>
