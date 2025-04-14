@@ -1,4 +1,4 @@
-import { Button, Dialog } from "@mui/material";
+import { Button, Dialog, TextField } from "@mui/material";
 import axios from "axios";
 import { useState } from "react";
 
@@ -37,7 +37,11 @@ export default function Reviews({ id, user }) {
             body: JSON.stringify(review),
         })
 
-
+        setReview({
+            title: '',
+            body: '',
+            poster: user.name
+        });
     }
     const listReviews = reviews.map(r => {
         return (
@@ -62,7 +66,21 @@ export default function Reviews({ id, user }) {
                 <Button variant="outlined" color="secondary" size="small" onClick={handleClose}>Close</Button>
                 <ul>{listReviews}</ul>
 
-                
+                <TextField
+                    type="text"
+                    name="title"
+                    label="Title"
+                    value={review.title}
+                    onChange={e => handleInputChange(e)}
+                />
+                <TextField
+                    type="text"
+                    name="body"
+                    label="Review"
+                    value={review.body}
+                    onChange={e => handleInputChange(e)}
+                />
+                <Button variant="contained" color="primary" size="medium" onClick={handleSave}>Save</Button>
             </Dialog>
         </>
     )
