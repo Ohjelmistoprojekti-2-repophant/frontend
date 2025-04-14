@@ -25,6 +25,7 @@ import axios from 'axios';
 const apiUrl = import.meta.env.VITE_API_URL;
 
 const App = () => {
+	const [lastCommits, setLastCommits] = useState([]);
 	const [projects, setProjects] = useState([]);
 	const [newProject, setNewProject] = useState({
 		name: '',
@@ -47,6 +48,13 @@ const App = () => {
 		fetchProjects();
 	}, []);
 
+	useEffect(() => {
+		if (projects.length > 0) {
+		  fetchLastCommits(projects);
+		}
+	  }, [projects]);
+	  
+
 	/**
 	 * Fetch projects from the API and set the projects state.
 	 * Logs an error message if the fetch fails.
@@ -60,6 +68,32 @@ const App = () => {
 			console.error('Error fetching projects:', error);
 		}
 	};
+
+	const fetchLastCommits = async (projects) => {
+		const commits = {};
+	  
+		for (const project of projects) {
+		  try {
+			const url = new URL(project.repositoryLink);
+			const [owner, repo] = url.pathname.slice(1).split("/");
+			const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/commits`);
+			const data = await response.json();
+			if (Array.isArray(data) && data.length > 0) {
+			  const lastCommitDate = new Date(data[0].commit.author.date).toLocaleDateString('fi-FI', {
+				day: 'numeric',
+				month: 'long',
+				year: 'numeric',
+			  });
+			  commits[project.id] = lastCommitDate;
+			}
+		  } catch (error) {
+			console.error(`Error fetching commits for ${project.name}:`, error);
+		  }
+		}
+	  
+		setLastCommits(commits);
+	  };
+	  
 
 	/**
 	 * Creates a new project and adds it to the projects state and the API.
@@ -418,6 +452,13 @@ const App = () => {
 										Created At:{' '}
 										{new Date(project.createdAt).toLocaleDateString()}
 									</Typography>
+
+									{lastCommits[project.id] && (
+                                  <Typography variant="body2">Latest commit: {lastCommits[project.id]}
+								  </Typography>
+                                       )}
+
+
 									<Stack direction="row" spacing={1} sx={{ mt: 2 }}>
 										<Button
 											variant="outlined"
