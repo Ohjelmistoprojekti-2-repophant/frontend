@@ -21,6 +21,7 @@ import GithubProfileAnalyzer from './GithubProfileAnalyzer';
 import { Masonry } from '@mui/lab';
 import ScrollToTop from './ScrollToTop';
 import axios from 'axios';
+import Reviews from './Reviews';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -39,7 +40,7 @@ const App = () => {
 	const [searchQuery, setSearchQuery] = useState(''); // State for the search query
 	const [sortMode, setSortMode] = useState('default'); // State to manage sort mode
 	const [mode, setMode] = useState('light');
-	const [user, setUser] = useState(null);
+	const [user, setUser] = useState({});
 
 	/**
 	 * useEffect hook to fetch projects when the component mounts.
@@ -270,7 +271,7 @@ const App = () => {
 				label="dark mode"
 				onChange={() => setMode(mode === 'light' ? 'dark' : 'light')}
 			/>
-			{user ? (
+			{user.id != null ? (
 				<Box sx={{ p: 2 }}>
 					<Typography variant="h6">Welcome, {user.name}</Typography>
 					<GithubProfileAnalyzer />
@@ -476,6 +477,7 @@ const App = () => {
 										>
 											Delete
 										</Button>
+										<Reviews id={project.id} user={user} />
 									</Stack>
 								</Box>
 							))}
