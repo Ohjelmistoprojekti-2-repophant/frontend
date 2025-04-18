@@ -2,25 +2,11 @@ import { useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { TextField, Button, Typography, Box, Stack } from '@mui/material';
 
-/**
- * GithubRepoFetcher component fetches details of a GitHub repository and sets the project details.
- *
- * @component
- * @param {Object} props - The component props.
- * @param {Function} props.setProjectDetails - Function to set the project details.
- *
- * @returns {JSX.Element} The rendered component.
- */
 const GithubRepoFetcher = ({ setProjectDetails }) => {
 	const [repoUrl, setRepoUrl] = useState('');
 	const [error, setError] = useState(null);
 	const [lastCommitDate, setLastCommitDate] = useState(null);
 
-	/**
-	 * Fetches the details of a GitHub repository from the provided URL.
-	 * If the URL is valid and the repository is found, sets the project details.
-	 * Otherwise, sets an error message.
-	 */
 	const fetchRepoDetails = useCallback(async () => {
 		// Validate the GitHub repository URL
 		if (!repoUrl.startsWith('https://github.com/')) {
@@ -47,7 +33,9 @@ const GithubRepoFetcher = ({ setProjectDetails }) => {
 				const commitsData = await commitsResponse.json();
 				if (commitsData.length > 0) {
 					setLastCommitDate(
-						new Date(commitsData[0].commit.author.date).toLocaleDateString('fi-FI')
+						new Date(commitsData[0].commit.author.date).toLocaleDateString(
+							'fi-FI'
+						)
 					);
 				}
 			}
@@ -100,10 +88,6 @@ const GithubRepoFetcher = ({ setProjectDetails }) => {
 	);
 };
 
-/**
- * PropTypes definition for GithubRepoFetcher component.
- * @prop {function} setProjectDetails - Function to set the project details fetched from the GitHub repository.
- */
 GithubRepoFetcher.propTypes = {
 	setProjectDetails: PropTypes.func.isRequired,
 };

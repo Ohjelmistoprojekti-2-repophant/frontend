@@ -31,7 +31,8 @@ export default [
       ...js.configs.recommended.rules,
       ...react.configs.recommended.rules,
       'react/react-in-jsx-scope': 'off',
-      'react/jsx-uses-react': 'off'
+      'react/jsx-uses-react': 'off',
+      'react/prop-types': 'off',
     },
   },
 ]
