@@ -16,12 +16,12 @@ import {
 	FormControlLabel,
 	Switch,
 } from '@mui/material';
-import GithubRepoFetcher from './GithubRepoFetcher';
-import GithubProfileAnalyzer from './GithubProfileAnalyzer';
+import ProjectCard from '../components/ProjectCard';
+import GithubRepoFetcher from '../components/GithubRepoFetcher';
+import GithubProfileAnalyzer from '../components/GithubProfileAnalyzer';
 import { Masonry } from '@mui/lab';
-import ScrollToTop from './ScrollToTop';
+import ScrollToTop from '../utils/ScrollToTop';
 import axios from 'axios';
-import Reviews from './Reviews';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -51,10 +51,9 @@ const App = () => {
 
 	useEffect(() => {
 		if (projects.length > 0) {
-		  fetchLastCommits(projects);
+			fetchLastCommits(projects);
 		}
-	  }, [projects]);
-	  
+	}, [projects]);
 
 	/**
 	 * Fetch projects from the API and set the projects state.
@@ -72,29 +71,32 @@ const App = () => {
 
 	const fetchLastCommits = async (projects) => {
 		const commits = {};
-	  
+
 		for (const project of projects) {
-		  try {
-			const url = new URL(project.repositoryLink);
-			const [owner, repo] = url.pathname.slice(1).split("/");
-			const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/commits`);
-			const data = await response.json();
-			if (Array.isArray(data) && data.length > 0) {
-			  const lastCommitDate = new Date(data[0].commit.author.date).toLocaleDateString('fi-FI', {
-				day: 'numeric',
-				month: 'long',
-				year: 'numeric',
-			  });
-			  commits[project.id] = lastCommitDate;
+			try {
+				const url = new URL(project.repositoryLink);
+				const [owner, repo] = url.pathname.slice(1).split('/');
+				const response = await fetch(
+					`https://api.github.com/repos/${owner}/${repo}/commits`
+				);
+				const data = await response.json();
+				if (Array.isArray(data) && data.length > 0) {
+					const lastCommitDate = new Date(
+						data[0].commit.author.date
+					).toLocaleDateString('fi-FI', {
+						day: 'numeric',
+						month: 'long',
+						year: 'numeric',
+					});
+					commits[project.id] = lastCommitDate;
+				}
+			} catch (error) {
+				console.error(`Error fetching commits for ${project.name}:`, error);
 			}
-		  } catch (error) {
-			console.error(`Error fetching commits for ${project.name}:`, error);
-		  }
 		}
-	  
+
 		setLastCommits(commits);
-	  };
-	  
+	};
 
 	/**
 	 * Creates a new project and adds it to the projects state and the API.
@@ -422,64 +424,14 @@ const App = () => {
 						<Typography variant="h4">Project List</Typography>
 						<Masonry columns={3} spacing={2}>
 							{filteredProjects.map((project) => (
-								<Box
+								<ProjectCard
 									key={project.id}
-									sx={{
-										border: '1px solid #ddd',
-										padding: 2,
-										borderRadius: 1,
-										display: 'flex',
-										flexDirection: 'column',
-										overflow: 'hidden', // Hide anything overflowing the container
-										wordWrap: 'break-word', // Prevent long words from overflowing
-									}}
-								>
-									<Typography variant="h6">{project.name}</Typography>
-									<Typography variant="body2">{project.description}</Typography>
-									<Typography variant="body2">
-										URL:{' '}
-										<a
-											href={project.repositoryLink}
-											target="_blank"
-											rel="noopener noreferrer"
-										>
-											{project.repositoryLink}
-										</a>
-									</Typography>
-									<Typography variant="body2">
-										Language: {project.language}
-									</Typography>
-									<Typography variant="body2">
-										Created At:{' '}
-										{new Date(project.createdAt).toLocaleDateString()}
-									</Typography>
-
-									{lastCommits[project.id] && (
-                                  <Typography variant="body2">Latest commit: {lastCommits[project.id]}
-								  </Typography>
-                                       )}
-
-
-									<Stack direction="row" spacing={1} sx={{ mt: 2 }}>
-										<Button
-											variant="outlined"
-											color="primary"
-											size="small"
-											onClick={() => handleEditClick(project)}
-										>
-											Edit
-										</Button>
-										<Button
-											variant="outlined"
-											color="error"
-											size="small"
-											onClick={() => deleteProject(project.id)}
-										>
-											Delete
-										</Button>
-										<Reviews id={project.id} user={user} />
-									</Stack>
-								</Box>
+									project={project}
+									lastCommit={lastCommits[project.id]}
+									onEdit={handleEditClick}
+									onDelete={deleteProject}
+									user={user}
+								/>
 							))}
 						</Masonry>
 					</Stack>
