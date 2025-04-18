@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import PropTypes from 'prop-types';
 import {
 	Box,
 	Typography,
@@ -136,10 +135,6 @@ const GithubProfileAnalyzer = () => {
 		</Alert>
 	);
 
-	ErrorMessage.propTypes = {
-		message: PropTypes.string.isRequired,
-	};
-
 	const TechnologiesSection = ({ technologies }) => (
 		<Box>
 			<Typography variant="h6" gutterBottom>
@@ -152,10 +147,6 @@ const GithubProfileAnalyzer = () => {
 			</Box>
 		</Box>
 	);
-
-	TechnologiesSection.propTypes = {
-		technologies: PropTypes.arrayOf(PropTypes.string).isRequired,
-	};
 
 	const ProjectsSection = ({ projects }) => (
 		<Box>
@@ -185,15 +176,6 @@ const GithubProfileAnalyzer = () => {
 		</Box>
 	);
 
-	ProjectsSection.propTypes = {
-		projects: PropTypes.shape({
-			total: PropTypes.number.isRequired,
-			personal: PropTypes.number.isRequired,
-			forked: PropTypes.number.isRequired,
-			archived: PropTypes.number.isRequired,
-		}).isRequired,
-	};
-
 	const PracticesSection = ({ practices, totalProjects }) => (
 		<Box>
 			<Typography variant="h6" gutterBottom>
@@ -221,15 +203,6 @@ const GithubProfileAnalyzer = () => {
 			</List>
 		</Box>
 	);
-
-	PracticesSection.propTypes = {
-		practices: PropTypes.shape({
-			hasReadme: PropTypes.number.isRequired,
-			hasTests: PropTypes.number.isRequired,
-			hasIssues: PropTypes.number.isRequired,
-		}).isRequired,
-		totalProjects: PropTypes.number.isRequired,
-	};
 
 	return (
 		<Box sx={{ p: 3 }}>
