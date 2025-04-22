@@ -24,6 +24,7 @@ import ScrollToTop from '../utils/ScrollToTop';
 import axios from 'axios';
 
 const apiUrl = import.meta.env.VITE_API_URL;
+const proxyUrl = import.meta.env.VITE_PROXY_URL;
 
 const App = () => {
 	const [lastCommits, setLastCommits] = useState([]);
@@ -77,7 +78,7 @@ const App = () => {
 				const url = new URL(project.repositoryLink);
 				const [owner, repo] = url.pathname.slice(1).split('/');
 				const response = await fetch(
-					`https://api.github.com/repos/${owner}/${repo}/commits`
+					`${proxyUrl}/repos/${owner}/${repo}/commits`
 				);
 				const data = await response.json();
 				if (Array.isArray(data) && data.length > 0) {

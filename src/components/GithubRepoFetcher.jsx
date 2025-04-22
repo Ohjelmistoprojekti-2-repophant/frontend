@@ -2,6 +2,8 @@ import { useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { TextField, Button, Typography, Box, Stack } from '@mui/material';
 
+const proxyUrl = import.meta.env.VITE_PROXY_URL;
+
 const GithubRepoFetcher = ({ setProjectDetails }) => {
 	const [repoUrl, setRepoUrl] = useState('');
 	const [error, setError] = useState(null);
@@ -19,7 +21,7 @@ const GithubRepoFetcher = ({ setProjectDetails }) => {
 
 		try {
 			// Fetch repository details from the GitHub API
-			const response = await fetch(`https://api.github.com/repos/${repoPath}`);
+			const response = await fetch(`${proxyUrl}/repos/${repoPath}`);
 			if (!response.ok) {
 				throw new Error('Repository not found');
 			}
@@ -27,7 +29,7 @@ const GithubRepoFetcher = ({ setProjectDetails }) => {
 
 			// Fetch the last commit date
 			const commitsResponse = await fetch(
-				`https://api.github.com/repos/${repoPath}/commits?per_page=1`
+				`${proxyUrl}/repos/${repoPath}/commits?per_page=1`
 			);
 			if (commitsResponse.ok) {
 				const commitsData = await commitsResponse.json();
