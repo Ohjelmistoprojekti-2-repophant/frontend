@@ -1,7 +1,7 @@
 import { Box, Typography, Stack, Button } from '@mui/material';
 import Reviews from '../Reviews';
 
-const ProjectCard = ({ project, lastCommit, onEdit, onDelete, user }) => {
+const ProjectCard = ({ project, onEdit, onDelete, user }) => {
 	return (
 		<Box
 			key={project.id}
@@ -31,9 +31,9 @@ const ProjectCard = ({ project, lastCommit, onEdit, onDelete, user }) => {
 			<Typography variant="body2">
 				Created At: {new Date(project.createdAt).toLocaleDateString()}
 			</Typography>
-			{lastCommit && (
-				<Typography variant="body2">Latest commit: {lastCommit}</Typography>
-			)}
+			<Typography variant="body2">
+				Latest commit: {new Date(project.pushedAt).toLocaleDateString()}
+			</Typography>
 			<Stack direction="row" spacing={1} sx={{ mt: 2 }}>
 				<Button
 					variant="outlined"
