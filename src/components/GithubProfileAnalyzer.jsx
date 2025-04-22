@@ -16,6 +16,7 @@ import {
 import axios from 'axios';
 
 const apiUrl = import.meta.env.VITE_API_URL;
+const proxyUrl = import.meta.env.VITE_PROXY_URL;
 
 // Initial state for analysis
 const INITIAL_ANALYSIS = {
@@ -34,7 +35,7 @@ const INITIAL_ANALYSIS = {
 
 const fetchRepositoryContents = async (username, repoName, token) => {
 	const response = await axios.get(
-		`https://api.github.com/repos/${username}/${repoName}/contents`,
+		`${proxyUrl}/repos/${username}/${repoName}/contents`,
 		{
 			headers: {
 				Accept: 'application/vnd.github.v3+json',
@@ -77,7 +78,7 @@ const GithubProfileAnalyzer = () => {
 			const token = tokenResponse.data.token;
 
 			const reposResponse = await axios.get(
-				`https://api.github.com/users/${targetUsername}/repos`,
+				`${proxyUrl}/users/${targetUsername}/repos`,
 				{
 					headers: {
 						Accept: 'application/vnd.github.v3+json',
