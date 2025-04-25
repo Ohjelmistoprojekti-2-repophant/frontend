@@ -1,5 +1,4 @@
 import { useState, useCallback } from 'react';
-import PropTypes from 'prop-types';
 import { TextField, Button, Typography, Box, Stack } from '@mui/material';
 
 const proxyUrl = import.meta.env.VITE_PROXY_URL;
@@ -7,7 +6,6 @@ const proxyUrl = import.meta.env.VITE_PROXY_URL;
 const GithubRepoFetcher = ({ setProjectDetails }) => {
 	const [repoUrl, setRepoUrl] = useState('');
 	const [error, setError] = useState(null);
-	const [lastCommitDate, setLastCommitDate] = useState(null);
 
 	const fetchRepoDetails = useCallback(async () => {
 		// Validate the GitHub repository URL
@@ -27,21 +25,6 @@ const GithubRepoFetcher = ({ setProjectDetails }) => {
 			}
 			const data = await response.json();
 
-			// Fetch the last commit date
-			const commitsResponse = await fetch(
-				`${proxyUrl}/repos/${repoPath}/commits?per_page=1`
-			);
-			if (commitsResponse.ok) {
-				const commitsData = await commitsResponse.json();
-				if (commitsData.length > 0) {
-					setLastCommitDate(
-						new Date(commitsData[0].commit.author.date).toLocaleDateString(
-							'fi-FI'
-						)
-					);
-				}
-			}
-
 			// Set the project details with the fetched data
 			setProjectDetails({
 				name: data.full_name,
@@ -49,6 +32,7 @@ const GithubRepoFetcher = ({ setProjectDetails }) => {
 				html_url: data.html_url,
 				language: data.language,
 				created_at: data.created_at,
+				pushed_at: data.pushed_at,
 			});
 			setError(null);
 		} catch (error) {
@@ -81,17 +65,8 @@ const GithubRepoFetcher = ({ setProjectDetails }) => {
 					{error}
 				</Typography>
 			)}
-			{lastCommitDate && (
-				<Typography variant="body1" sx={{ mt: 2 }}>
-					Last Commit: {lastCommitDate}
-				</Typography>
-			)}
 		</Box>
 	);
-};
-
-GithubRepoFetcher.propTypes = {
-	setProjectDetails: PropTypes.func.isRequired,
 };
 
 export default GithubRepoFetcher;
