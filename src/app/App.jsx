@@ -14,7 +14,12 @@ import {
 	createTheme,
 	ThemeProvider,
 	FormControlLabel,
+	FormControl,
+	Select,
+	InputLabel,
+	Chip,
 	Switch,
+	MenuItem,
 } from '@mui/material';
 import ProjectCard from '../components/ProjectCard';
 import GithubRepoFetcher from '../components/GithubRepoFetcher';
@@ -37,8 +42,9 @@ const App = () => {
 	});
 	const [editProject, setEditProject] = useState(null);
 	const [open, setOpen] = useState(false);
-	const [searchQuery, setSearchQuery] = useState(''); // State for the search query
 	const [sortMode, setSortMode] = useState('default'); // State to manage sort mode
+	const [languages, setLanguages] = useState([]);
+	const [selectedLanguage, setSelectedLanguage] = useState('');
 	const [mode, setMode] = useState('light');
 	const [user, setUser] = useState({});
 
@@ -58,6 +64,7 @@ const App = () => {
 			const response = await fetch(`${apiUrl}/api/projects`);
 			const data = await response.json();
 			setProjects(data);
+			setLanguages([...new Set(data.map((project) => project.language))]);
 		} catch (error) {
 			console.error('Error fetching projects:', error);
 		}
@@ -175,7 +182,7 @@ const App = () => {
 	};
 
 	const handleSearchChange = (event) => {
-		setSearchQuery(event.target.value);
+		setSelectedLanguage(event.target.value);
 	};
 
 	const sortedProjects = useMemo(() => {
@@ -192,12 +199,12 @@ const App = () => {
 
 	// Filters the sorted projects based on the search query
 	const filteredProjects = useMemo(() => {
-		return sortedProjects.filter(
-			(project) =>
-				project.name &&
-				project.name.toLowerCase().includes(searchQuery.toLowerCase())
+		return sortedProjects.filter((project) =>
+			selectedLanguage == ''
+				? project.language
+				: project.language == selectedLanguage
 		);
-	}, [sortedProjects, searchQuery]);
+	}, [sortedProjects, selectedLanguage]);
 
 	// Changes the sorting method
 	const toggleSort = () => {
@@ -319,17 +326,31 @@ const App = () => {
 				</Box>
 
 				{/* Edit project modal */}
-				<Box sx={{ mt: 3, width: 230 }}>
-					<TextField
-						name="repositorySearchBar"
-						label="Search Projects By Name"
-						variant="outlined"
-						fullWidth
-						value={searchQuery}
-						onChange={handleSearchChange}
-					/>
+				<Box sx={{ mt: 3, minWidth: 230 }}>
+					<FormControl fullWidth>
+						<InputLabel id="select-label">Language</InputLabel>
+						<Select
+							labelId="select-label"
+							label="Language"
+							value={selectedLanguage}
+							onChange={handleSearchChange}
+							renderValue={() => (
+								<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+									<Chip key={selectedLanguage} label={selectedLanguage} />
+								</Box>
+							)}
+						>
+							<MenuItem value="">
+								<em>None</em>
+							</MenuItem>
+							{languages.map((item) => (
+								<MenuItem key={item} value={item}>
+									{item}
+								</MenuItem>
+							))}
+						</Select>
+					</FormControl>
 				</Box>
-
 				<Dialog open={open} onClose={handleClose}>
 					<DialogTitle>Edit Project</DialogTitle>
 					<DialogContent>
