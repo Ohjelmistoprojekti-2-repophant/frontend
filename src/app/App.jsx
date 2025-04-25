@@ -19,7 +19,7 @@ import {
 	InputLabel,
 	Chip,
 	Switch,
-	MenuItem
+	MenuItem,
 } from '@mui/material';
 import ProjectCard from '../components/ProjectCard';
 import GithubRepoFetcher from '../components/GithubRepoFetcher';
@@ -43,8 +43,8 @@ const App = () => {
 	const [editProject, setEditProject] = useState(null);
 	const [open, setOpen] = useState(false);
 	const [sortMode, setSortMode] = useState('default'); // State to manage sort mode
-	const [languages, setLanguages] = useState([])
-	const [selectedLanguage, setSelectedLanguage] = useState("")
+	const [languages, setLanguages] = useState([]);
+	const [selectedLanguage, setSelectedLanguage] = useState('');
 	const [mode, setMode] = useState('light');
 	const [user, setUser] = useState({});
 
@@ -64,7 +64,7 @@ const App = () => {
 			const response = await fetch(`${apiUrl}/api/projects`);
 			const data = await response.json();
 			setProjects(data);
-			setLanguages([...new Set(data.map((project) => project.language))])
+			setLanguages([...new Set(data.map((project) => project.language))]);
 		} catch (error) {
 			console.error('Error fetching projects:', error);
 		}
@@ -199,9 +199,10 @@ const App = () => {
 
 	// Filters the sorted projects based on the search query
 	const filteredProjects = useMemo(() => {
-		return sortedProjects.filter(
-			(project) =>
-				(selectedLanguage == "") ? project.language : project.language == (selectedLanguage)
+		return sortedProjects.filter((project) =>
+			selectedLanguage == ''
+				? project.language
+				: project.language == selectedLanguage
 		);
 	}, [sortedProjects, selectedLanguage]);
 
@@ -339,12 +340,11 @@ const App = () => {
 								</Box>
 							)}
 						>
-							<MenuItem value=""><em>None</em></MenuItem>
+							<MenuItem value="">
+								<em>None</em>
+							</MenuItem>
 							{languages.map((item) => (
-								<MenuItem
-									key={item}
-									value={item}
-								>
+								<MenuItem key={item} value={item}>
 									{item}
 								</MenuItem>
 							))}
