@@ -326,31 +326,6 @@ const App = () => {
 				</Box>
 
 				{/* Edit project modal */}
-				<Box sx={{ mt: 3, minWidth: 230 }}>
-					<FormControl fullWidth>
-						<InputLabel id="select-label">Language</InputLabel>
-						<Select
-							labelId="select-label"
-							label="Language"
-							value={selectedLanguage}
-							onChange={handleSearchChange}
-							renderValue={() => (
-								<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-									<Chip key={selectedLanguage} label={selectedLanguage} />
-								</Box>
-							)}
-						>
-							<MenuItem value="">
-								<em>None</em>
-							</MenuItem>
-							{languages.map((item) => (
-								<MenuItem key={item} value={item}>
-									{item}
-								</MenuItem>
-							))}
-						</Select>
-					</FormControl>
-				</Box>
 				<Dialog open={open} onClose={handleClose}>
 					<DialogTitle>Edit Project</DialogTitle>
 					<DialogContent>
@@ -411,19 +386,45 @@ const App = () => {
 					</DialogActions>
 				</Dialog>
 
-				{/* Sorting button */}
+
+				<Box id="project-box" sx={{ mt: 5, width: '80%' }}>
+					<Stack spacing={1} sx={{ display: 'flex', alignItems: 'center' }}>
+					<Typography variant="h4">Project List</Typography>
 				<Box sx={{ mt: 2 }}>
+				<Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 2 }}>
 					<Button variant="outlined" onClick={toggleSort}>
 						{sortMode === 'default' && 'Click to Sort Alphabetically'}
 						{sortMode === 'name' && 'Click to Sort By Newest'}
 						{sortMode === 'newest' && 'Click to Sort By Oldest'}
 						{sortMode === 'oldest' && 'Clear Sorting'}
 					</Button>
+					<Box sx={{ minWidth: 230 }}>
+						<FormControl fullWidth>
+							<InputLabel id="select-label">Language</InputLabel>
+							<Select
+								labelId="select-label"
+								label="Language"
+								value={selectedLanguage}
+								onChange={handleSearchChange}
+								renderValue={() => (
+									<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+										<Chip key={selectedLanguage} label={selectedLanguage} />
+									</Box>
+								)}
+							>
+								<MenuItem value="">
+									<em>None</em>
+								</MenuItem>
+								{languages.map((item) => (
+									<MenuItem key={item} value={item}>
+										{item}
+									</MenuItem>
+								))}
+							</Select>
+						</FormControl>
+					</Box>
 				</Box>
-
-				<Box id="project-box" sx={{ mt: 5, width: '80%' }}>
-					<Stack spacing={1} sx={{ display: 'flex', alignItems: 'center' }}>
-						<Typography variant="h4">Project List</Typography>
+				</Box>
 						<Masonry columns={3} spacing={2}>
 							{filteredProjects.map((project) => (
 								<ProjectCard
