@@ -47,6 +47,8 @@ const App = () => {
 	const [selectedLanguage, setSelectedLanguage] = useState('');
 	const [mode, setMode] = useState('light');
 	const [user, setUser] = useState({});
+	const [localCreatedAt, setLocalCreatedAt] = useState("");
+	const [localPushedAt, setLocalPushedAt] = useState("");
 
 	/**
 	 * useEffect hook to fetch projects when the component mounts.
@@ -166,6 +168,20 @@ const App = () => {
 	 */
 	const handleSave = async () => {
 		try {
+			const updatedProject = {
+				...editProject,
+				createdAt: localCreatedAt
+					? new Date(
+							localCreatedAt.split("/").reverse().join("-") + "T00:00:00Z"
+					  ).toISOString()
+					: null,
+				pushedAt: localPushedAt
+					? new Date(
+							localPushedAt.split("/").reverse().join("-") + "T00:00:00Z"
+					  ).toISOString()
+					: null,
+			};
+
 			await fetch(`${apiUrl}/api/projects/${editProject.id}`, {
 				method: 'PUT',
 				headers: { 'Content-Type': 'application/json' },
@@ -173,7 +189,7 @@ const App = () => {
 			});
 
 			setProjects(
-				projects.map((p) => (p.id === editProject.id ? editProject : p))
+				projects.map((p) => (p.id === editProject.id ? updatedProject : p))
 			);
 			handleClose();
 		} catch (error) {
@@ -226,6 +242,30 @@ const App = () => {
 				console.error('Error occured: ', error);
 			});
 	}, []);
+
+	useEffect(() => {
+		if (editProject) {
+			setLocalCreatedAt(
+				editProject.createdAt
+					? new Date(editProject.createdAt).toLocaleDateString("en-GB") // Converts format to DD/MM/YYYY
+					: ""
+			);
+			setLocalPushedAt(
+				editProject.pushedAt
+					? new Date(editProject.pushedAt).toLocaleDateString("en-GB") // Converts format to DD/MM/YYYY
+					: ""
+			);
+		}
+	}, [editProject]); 
+
+	const handleLocalChange = (e) => {
+		const { name, value } = e.target;
+		if (name === "createdAt") {
+			setLocalCreatedAt(value);
+		} else if (name === "pushedAt") {
+			setLocalPushedAt(value);
+		}
+	};
 
 	return (
 		<ThemeProvider theme={darkTheme}>
@@ -352,14 +392,16 @@ const App = () => {
 							label="Created At"
 							fullWidth
 							name="createdAt"
-							onChange={handleEditChange}
+							value={localCreatedAt} 
+							onChange={handleLocalChange} 
 							margin="dense"
 						/>
 						<TextField
 							label="Pushed At"
 							fullWidth
 							name="pushedAt"
-							onChange={handleEditChange}
+							value={localPushedAt} 
+							onChange={handleLocalChange} 
 							margin="dense"
 						/>
 					</DialogContent>
