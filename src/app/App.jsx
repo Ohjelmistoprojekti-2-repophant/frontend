@@ -11,14 +11,10 @@ import {
 	DialogTitle,
 	DialogContent,
 	DialogActions,
-	createTheme,
-	ThemeProvider,
-	FormControlLabel,
 	FormControl,
 	Select,
 	InputLabel,
 	Chip,
-	Switch,
 	MenuItem,
 } from '@mui/material';
 import ProjectCard from '../components/ProjectCard';
@@ -27,6 +23,7 @@ import GithubProfileAnalyzer from '../components/GithubProfileAnalyzer';
 import { Masonry } from '@mui/lab';
 import ScrollToTop from '../utils/ScrollToTop';
 import axios from 'axios';
+import ThemeManager from '../utils/ThemeManager';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -45,8 +42,9 @@ const App = () => {
 	const [sortMode, setSortMode] = useState('default'); // State to manage sort mode
 	const [languages, setLanguages] = useState([]);
 	const [selectedLanguage, setSelectedLanguage] = useState('');
-	const [mode, setMode] = useState('light');
 	const [user, setUser] = useState({});
+	const [localCreatedAt, setLocalCreatedAt] = useState("");
+	const [localPushedAt, setLocalPushedAt] = useState("");
 
 	/**
 	 * useEffect hook to fetch projects when the component mounts.
@@ -166,6 +164,20 @@ const App = () => {
 	 */
 	const handleSave = async () => {
 		try {
+			const updatedProject = {
+				...editProject,
+				createdAt: localCreatedAt
+					? new Date(
+							localCreatedAt.split("/").reverse().join("-") + "T00:00:00Z"
+					  ).toISOString()
+					: null,
+				pushedAt: localPushedAt
+					? new Date(
+							localPushedAt.split("/").reverse().join("-") + "T00:00:00Z"
+					  ).toISOString()
+					: null,
+			};
+
 			await fetch(`${apiUrl}/api/projects/${editProject.id}`, {
 				method: 'PUT',
 				headers: { 'Content-Type': 'application/json' },
@@ -173,7 +185,7 @@ const App = () => {
 			});
 
 			setProjects(
-				projects.map((p) => (p.id === editProject.id ? editProject : p))
+				projects.map((p) => (p.id === editProject.id ? updatedProject : p))
 			);
 			handleClose();
 		} catch (error) {
@@ -206,25 +218,6 @@ const App = () => {
 		);
 	}, [sortedProjects, selectedLanguage]);
 
-	// Changes the sorting method
-	const toggleSort = () => {
-		setSortMode(
-			sortMode === 'default'
-				? 'name'
-				: sortMode === 'name'
-					? 'newest'
-					: sortMode === 'newest'
-						? 'oldest'
-						: 'default'
-		);
-	};
-
-	const darkTheme = createTheme({
-		palette: {
-			mode: mode,
-		},
-	});
-
 	const githubLogin = () => {
 		window.location.href = `${apiUrl}/oauth2/authorization/github`;
 	};
@@ -240,13 +233,32 @@ const App = () => {
 			});
 	}, []);
 
+	useEffect(() => {
+		if (editProject) {
+			setLocalCreatedAt(
+				editProject.createdAt
+					? new Date(editProject.createdAt).toLocaleDateString("en-GB") // Converts format to DD/MM/YYYY
+					: ""
+			);
+			setLocalPushedAt(
+				editProject.pushedAt
+					? new Date(editProject.pushedAt).toLocaleDateString("en-GB") // Converts format to DD/MM/YYYY
+					: ""
+			);
+		}
+	}, [editProject]); 
+
+	const handleLocalChange = (e) => {
+		const { name, value } = e.target;
+		if (name === "createdAt") {
+			setLocalCreatedAt(value);
+		} else if (name === "pushedAt") {
+			setLocalPushedAt(value);
+		}
+	};
+
 	return (
-		<ThemeProvider theme={darkTheme}>
-			<FormControlLabel
-				control={<Switch />}
-				label="dark mode"
-				onChange={() => setMode(mode === 'light' ? 'dark' : 'light')}
-			/>
+		<ThemeManager>
 			{user.id != null ? (
 				<Box sx={{ p: 2 }}>
 					<Typography variant="h6">Welcome, {user.name}</Typography>
@@ -326,31 +338,6 @@ const App = () => {
 				</Box>
 
 				{/* Edit project modal */}
-				<Box sx={{ mt: 3, minWidth: 230 }}>
-					<FormControl fullWidth>
-						<InputLabel id="select-label">Language</InputLabel>
-						<Select
-							labelId="select-label"
-							label="Language"
-							value={selectedLanguage}
-							onChange={handleSearchChange}
-							renderValue={() => (
-								<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-									<Chip key={selectedLanguage} label={selectedLanguage} />
-								</Box>
-							)}
-						>
-							<MenuItem value="">
-								<em>None</em>
-							</MenuItem>
-							{languages.map((item) => (
-								<MenuItem key={item} value={item}>
-									{item}
-								</MenuItem>
-							))}
-						</Select>
-					</FormControl>
-				</Box>
 				<Dialog open={open} onClose={handleClose}>
 					<DialogTitle>Edit Project</DialogTitle>
 					<DialogContent>
@@ -390,14 +377,16 @@ const App = () => {
 							label="Created At"
 							fullWidth
 							name="createdAt"
-							onChange={handleEditChange}
+							value={localCreatedAt} 
+							onChange={handleLocalChange} 
 							margin="dense"
 						/>
 						<TextField
 							label="Pushed At"
 							fullWidth
 							name="pushedAt"
-							onChange={handleEditChange}
+							value={localPushedAt} 
+							onChange={handleLocalChange} 
 							margin="dense"
 						/>
 					</DialogContent>
@@ -411,19 +400,55 @@ const App = () => {
 					</DialogActions>
 				</Dialog>
 
-				{/* Sorting button */}
-				<Box sx={{ mt: 2 }}>
-					<Button variant="outlined" onClick={toggleSort}>
-						{sortMode === 'default' && 'Click to Sort Alphabetically'}
-						{sortMode === 'name' && 'Click to Sort By Newest'}
-						{sortMode === 'newest' && 'Click to Sort By Oldest'}
-						{sortMode === 'oldest' && 'Clear Sorting'}
-					</Button>
-				</Box>
 
 				<Box id="project-box" sx={{ mt: 5, width: '80%' }}>
 					<Stack spacing={1} sx={{ display: 'flex', alignItems: 'center' }}>
-						<Typography variant="h4">Project List</Typography>
+					<Typography variant="h4">Project List</Typography>
+				<Box sx={{ mt: 2 }}>
+				<Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 2 }}>
+				<FormControl fullWidth sx={{ minWidth: 230 }}>
+					<InputLabel id="sort-select-label">Sort By</InputLabel>
+					<Select
+						labelId="sort-select-label"
+						value={sortMode}
+						onChange={(event) => setSortMode(event.target.value)}
+						label="Sort By"
+					>
+						<MenuItem value="default">
+							<em>None</em>
+						</MenuItem>
+						<MenuItem value="name">Alphabetically</MenuItem>
+						<MenuItem value="newest">Newest</MenuItem>
+						<MenuItem value="oldest">Oldest</MenuItem>
+					</Select>
+				</FormControl>
+				<Box sx={{ minWidth: 230 }}>
+					<FormControl fullWidth>
+						<InputLabel id="language-select-label">Language</InputLabel>
+						<Select
+							labelId="language-select-label"
+							value={selectedLanguage}
+							onChange={handleSearchChange}
+							label="Language"
+							renderValue={() => (
+								<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+									<Chip key={selectedLanguage} label={selectedLanguage} />
+								</Box>
+							)}
+						>
+							<MenuItem value="">
+								<em>None</em>
+							</MenuItem>
+							{languages.map((item) => (
+								<MenuItem key={item} value={item}>
+									{item}
+								</MenuItem>
+							))}
+						</Select>
+					</FormControl>
+				</Box>
+			</Box>
+				</Box>
 						<Masonry columns={3} spacing={2}>
 							{filteredProjects.map((project) => (
 								<ProjectCard
@@ -439,7 +464,7 @@ const App = () => {
 				</Box>
 				<ScrollToTop />
 			</Container>
-		</ThemeProvider>
+		</ThemeManager>
 	);
 };
 
