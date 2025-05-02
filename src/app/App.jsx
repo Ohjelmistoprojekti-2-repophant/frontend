@@ -11,14 +11,10 @@ import {
 	DialogTitle,
 	DialogContent,
 	DialogActions,
-	createTheme,
-	ThemeProvider,
-	FormControlLabel,
 	FormControl,
 	Select,
 	InputLabel,
 	Chip,
-	Switch,
 	MenuItem,
 } from '@mui/material';
 import ProjectCard from '../components/ProjectCard';
@@ -27,6 +23,7 @@ import GithubProfileAnalyzer from '../components/GithubProfileAnalyzer';
 import { Masonry } from '@mui/lab';
 import ScrollToTop from '../utils/ScrollToTop';
 import axios from 'axios';
+import ThemeManager from '../utils/ThemeManager';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -45,7 +42,6 @@ const App = () => {
 	const [sortMode, setSortMode] = useState('default'); // State to manage sort mode
 	const [languages, setLanguages] = useState([]);
 	const [selectedLanguage, setSelectedLanguage] = useState('');
-	const [mode, setMode] = useState('light');
 	const [user, setUser] = useState({});
 	const [localCreatedAt, setLocalCreatedAt] = useState("");
 	const [localPushedAt, setLocalPushedAt] = useState("");
@@ -222,12 +218,6 @@ const App = () => {
 		);
 	}, [sortedProjects, selectedLanguage]);
 
-	const darkTheme = createTheme({
-		palette: {
-			mode: mode,
-		},
-	});
-
 	const githubLogin = () => {
 		window.location.href = `${apiUrl}/oauth2/authorization/github`;
 	};
@@ -268,12 +258,7 @@ const App = () => {
 	};
 
 	return (
-		<ThemeProvider theme={darkTheme}>
-			<FormControlLabel
-				control={<Switch />}
-				label="dark mode"
-				onChange={() => setMode(mode === 'light' ? 'dark' : 'light')}
-			/>
+		<ThemeManager>
 			{user.id != null ? (
 				<Box sx={{ p: 2 }}>
 					<Typography variant="h6">Welcome, {user.name}</Typography>
@@ -479,7 +464,7 @@ const App = () => {
 				</Box>
 				<ScrollToTop />
 			</Container>
-		</ThemeProvider>
+		</ThemeManager>
 	);
 };
 
