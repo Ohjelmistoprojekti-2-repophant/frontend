@@ -1,4 +1,4 @@
-import { Button, Dialog, TextField } from '@mui/material';
+import { Button, Dialog, List, ListItemText, TextField } from '@mui/material';
 import axios from 'axios';
 import { useState } from 'react';
 
@@ -29,7 +29,6 @@ export default function Reviews({ id, user }) {
     };
 
     const handleSave = () => {
-        console.log(JSON.stringify(review))
         axios.post(`${apiUrl}/api/reviews/${id}`, review, {
             headers: {
                 'Content-Type': 'application/json',
@@ -43,15 +42,18 @@ export default function Reviews({ id, user }) {
             body: '',
             poster: user.name,
         });
+
+        axios.get(`${apiUrl}/api/reviews/${id}`).then((response) => {
+            setReviews(response.data);
+            
+        });
     };
     const listReviews = reviews.map((r) => {
         return (
-            <li key={r.id}>
-                <p>{r.poster}</p>
-                <p>{r.title}</p>
-                <p>{r.body}</p>
-                <p>{r.postedAt}</p>
-            </li>
+            <List key={r.id}>
+                <ListItemText primary={r.poster} secondary={new Date(r.postedAt).toLocaleString()} />
+                <ListItemText primary={r.title} secondary={r.body} />
+            </List>
         );
     });
 
@@ -90,6 +92,10 @@ export default function Reviews({ id, user }) {
                     value={review.body}
                     onChange={(e) => handleInputChange(e)}
                 />
+                {Object.keys(user).length === 0 ?
+                <p>Please log in to save your review</p>
+            :
+
                 <Button
                     variant="contained"
                     color="primary"
@@ -98,6 +104,7 @@ export default function Reviews({ id, user }) {
                 >
                     Save
                 </Button>
+            }
             </Dialog>
         </>
     );
