@@ -2,42 +2,36 @@ name: CI
 
 on:
   push:
-    branches: [ "main", "dev" ]
+    branches: ['main', 'dev']
   pull_request:
-    branches: [ "main", "dev" ]
+    branches: ['main', 'dev']
 
 jobs:
   frontend-build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'npm'
-      
-      - name: Clean npm cache and install dependencies
+
+      - name: Install dependencies
         run: |
-          echo "Cleaning npm cache and removing node_modules..."
-          rm -rf node_modules
-          rm -f package-lock.json
-          npm cache clean --force
-          
-          echo "Installing dependencies..."
-          npm install || { echo "Failed to install npm dependencies"; exit 1; }
-      
+          npm ci
+
       - name: Check formatting
-        run: npm run format:check || { echo "Formatting check failed"; exit 1; }
-      
+        run: npm run format:check
+
       - name: Lint
-        run: npm run lint || { echo "Linting failed"; exit 1; }
-      
+        run: npm run lint
+
       - name: Build
         run: |
           echo "Building project..."
-          npm run build || { 
+          npm run build || {
             echo "Build failed. Attempting to fix Rollup issue...";
             npm install @rollup/rollup-linux-x64-gnu --save-dev;
             npm run build || { echo "Build failed after fix attempt"; exit 1; }

@@ -8,6 +8,7 @@
 - [Software Project 2 course](https://hh-ohjelmistoprojekti-2.github.io/)
 
 # Link to Render deployment
+
 https://frontend-kmt6.onrender.com/
 
 # List of features
