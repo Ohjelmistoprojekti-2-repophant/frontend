@@ -1,44 +1,44 @@
 {
-  "name": "frontend",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "lint": "eslint .",
-    "preview": "vite preview",
-    "test:vite": "vite",
-    "test:robot": "robot --outputdir=robot/results robot/",
-    "test": "start-server-and-test test:vite http://localhost:5173 test:robot",
-    "start": "vite preview --port $PORT",
-    "render-build": "npm run build",
-    "format": "prettier --write \"src/**/*.{js,jsx}\"",
-    "format:check": "prettier --check \"src/**/*.{js,jsx}\""
-  },
-  "dependencies": {
-    "@emotion/react": "^11.14.0",
-    "@emotion/styled": "^11.14.0",
-    "@mui/lab": "^6.0.0-beta.26",
-    "@mui/material": "^6.4.3",
-    "axios": "^1.8.4",
-    "frontend": "file:",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
-  },
-  "devDependencies": {
-    "@eslint/js": "^9.17.0",
-    "@types/react": "^18.3.18",
-    "@types/react-dom": "^18.3.5",
-    "@vitejs/plugin-react": "^4.3.4",
-    "eslint": "^9.17.0",
-    "eslint-plugin-react": "^7.37.2",
-    "globals": "^15.14.0",
-    "prettier": "^3.5.3",
-    "start-server-and-test": "^2.0.11",
-    "vite": "^6.0.5"
-  },
-  "optionalDependencies": {
-    "@rollup/rollup-linux-x64-gnu": "4.6.1"
-  }
+	"name": "frontend",
+	"private": true,
+	"version": "0.0.0",
+	"type": "module",
+	"scripts": {
+		"dev": "vite",
+		"build": "vite build",
+		"lint": "eslint .",
+		"preview": "vite preview",
+		"test:vite": "vite",
+		"test:robot": "robot --outputdir=robot/results robot/",
+		"test": "start-server-and-test test:vite http://localhost:5173 test:robot",
+		"start": "vite preview --port $PORT",
+		"render-build": "npm run build",
+		"format": "prettier --write \"src/**/*.{js,jsx}\"",
+		"format:check": "prettier --check \"src/**/*.{js,jsx}\""
+	},
+	"dependencies": {
+		"@emotion/react": "^11.14.0",
+		"@emotion/styled": "^11.14.0",
+		"@mui/lab": "^6.0.0-beta.26",
+		"@mui/material": "^6.4.3",
+		"axios": "^1.8.4",
+		"frontend": "file:",
+		"react": "^18.3.1",
+		"react-dom": "^18.3.1"
+	},
+	"devDependencies": {
+		"@eslint/js": "^9.17.0",
+		"@types/react": "^18.3.18",
+		"@types/react-dom": "^18.3.5",
+		"@vitejs/plugin-react": "^4.3.4",
+		"eslint": "^9.17.0",
+		"eslint-plugin-react": "^7.37.2",
+		"globals": "^15.14.0",
+		"prettier": "^3.5.3",
+		"start-server-and-test": "^2.0.11",
+		"vite": "^6.0.5"
+	},
+	"optionalDependencies": {
+		"@rollup/rollup-linux-x64-gnu": "4.6.1"
+	}
 }
