@@ -18,21 +18,6 @@ import axios from 'axios';
 const apiUrl = import.meta.env.VITE_API_URL;
 const proxyUrl = import.meta.env.VITE_PROXY_URL;
 
-// Initial state for analysis
-const INITIAL_ANALYSIS = {
-	technologies: new Set(),
-	practices: {
-		hasReadme: 0,
-		hasTests: 0,
-		hasIssues: 0,
-	},
-	projects: {
-		total: 0,
-		personal: 0,
-		forked: 0,
-	},
-};
-
 const fetchRepositoryContents = async (username, repoName, token) => {
 	const response = await axios.get(
 		`${proxyUrl}/repos/${username}/${repoName}/contents`,
@@ -91,17 +76,38 @@ const GithubProfileAnalyzer = () => {
 				}
 			);
 
-			let analysis = { ...INITIAL_ANALYSIS };
+			let analysis = {
+				technologies: new Set(),
+				practices: {
+					hasReadme: 0,
+					hasTests: 0,
+					hasIssues: 0,
+				},
+				projects: {
+					total: 0,
+					personal: 0,
+					forked: 0,
+				},
+			};
 
 			for (const repo of reposResponse.data) {
 				analysis = analyzeRepository(repo, analysis);
 
-				const files = await fetchRepositoryContents(
-					targetUsername,
-					repo.name,
-					token
-				);
-				analysis = checkDevelopmentPractices(files, analysis);
+				try {
+					const files = await fetchRepositoryContents(
+						targetUsername,
+						repo.name,
+						token
+					);
+
+					if (files.length > 0) {
+						analysis = checkDevelopmentPractices(files, analysis);
+					}
+					// else: repo is empty — silently skip it
+				} catch (err) {
+					console.warn(`Skipping ${repo.name}: failed to fetch contents.`, err);
+					// Skip this repo and continue the loop
+				}
 			}
 
 			setProfileData({
@@ -166,12 +172,6 @@ const GithubProfileAnalyzer = () => {
 				</ListItem>
 				<ListItem>
 					<ListItemText primary="Forked Projects" secondary={projects.forked} />
-				</ListItem>
-				<ListItem>
-					<ListItemText
-						primary="Archived Projects"
-						secondary={projects.archived}
-					/>
 				</ListItem>
 			</List>
 		</Box>
