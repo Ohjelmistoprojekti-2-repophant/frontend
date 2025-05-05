@@ -43,8 +43,8 @@ const App = () => {
 	const [languages, setLanguages] = useState([]);
 	const [selectedLanguage, setSelectedLanguage] = useState('');
 	const [user, setUser] = useState({});
-	const [localCreatedAt, setLocalCreatedAt] = useState("");
-	const [localPushedAt, setLocalPushedAt] = useState("");
+	const [localCreatedAt, setLocalCreatedAt] = useState('');
+	const [localPushedAt, setLocalPushedAt] = useState('');
 
 	/**
 	 * useEffect hook to fetch projects when the component mounts.
@@ -59,10 +59,11 @@ const App = () => {
 	 */
 	const fetchProjects = async () => {
 		try {
-			const response = await fetch(`${apiUrl}/api/projects`);
-			const data = await response.json();
-			setProjects(data);
-			setLanguages([...new Set(data.map((project) => project.language))]);
+			const response = await axios.get(`${apiUrl}/api/projects`);
+			setProjects(response.data);
+			setLanguages([
+				...new Set(response.data.map((project) => project.language)),
+			]);
 		} catch (error) {
 			console.error('Error fetching projects:', error);
 		}
@@ -74,15 +75,12 @@ const App = () => {
 	 */
 	const createProject = async () => {
 		try {
-			const response = await fetch(`${apiUrl}/api/projects`, {
-				method: 'POST',
+			const response = await axios.post(`${apiUrl}/api/projects`, newProject, {
 				headers: {
 					'Content-Type': 'application/json',
 				},
-				body: JSON.stringify(newProject),
 			});
-			const data = await response.json();
-			setProjects([...projects, data]);
+			setProjects([...projects, response.data]);
 			setNewProject({
 				name: '',
 				description: '',
@@ -102,9 +100,7 @@ const App = () => {
 	 */
 	const deleteProject = async (id) => {
 		try {
-			await fetch(`${apiUrl}/api/projects/${id}`, {
-				method: 'DELETE',
-			});
+			await axios.delete(`${apiUrl}/api/projects/${id}`);
 			setProjects(projects.filter((project) => project.id !== id));
 		} catch (error) {
 			console.error('Error deleting project:', error);
@@ -168,21 +164,23 @@ const App = () => {
 				...editProject,
 				createdAt: localCreatedAt
 					? new Date(
-							localCreatedAt.split("/").reverse().join("-") + "T00:00:00Z"
-					  ).toISOString()
+							localCreatedAt.split('/').reverse().join('-') + 'T00:00:00Z'
+						).toISOString()
 					: null,
 				pushedAt: localPushedAt
 					? new Date(
-							localPushedAt.split("/").reverse().join("-") + "T00:00:00Z"
-					  ).toISOString()
+							localPushedAt.split('/').reverse().join('-') + 'T00:00:00Z'
+						).toISOString()
 					: null,
 			};
 
-			await fetch(`${apiUrl}/api/projects/${editProject.id}`, {
-				method: 'PUT',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(editProject),
-			});
+			await axios.put(
+				`${apiUrl}/api/projects/${editProject.id}`,
+				updatedProject,
+				{
+					headers: { 'Content-Type': 'application/json' },
+				}
+			);
 
 			setProjects(
 				projects.map((p) => (p.id === editProject.id ? updatedProject : p))
@@ -229,7 +227,7 @@ const App = () => {
 				setUser(response.data);
 			})
 			.catch((error) => {
-				console.error('Error occured: ', error);
+				console.error('Error occurred: ', error);
 			});
 	}, []);
 
@@ -237,22 +235,22 @@ const App = () => {
 		if (editProject) {
 			setLocalCreatedAt(
 				editProject.createdAt
-					? new Date(editProject.createdAt).toLocaleDateString("en-GB") // Converts format to DD/MM/YYYY
-					: ""
+					? new Date(editProject.createdAt).toLocaleDateString('en-GB') // Converts format to DD/MM/YYYY
+					: ''
 			);
 			setLocalPushedAt(
 				editProject.pushedAt
-					? new Date(editProject.pushedAt).toLocaleDateString("en-GB") // Converts format to DD/MM/YYYY
-					: ""
+					? new Date(editProject.pushedAt).toLocaleDateString('en-GB') // Converts format to DD/MM/YYYY
+					: ''
 			);
 		}
-	}, [editProject]); 
+	}, [editProject]);
 
 	const handleLocalChange = (e) => {
 		const { name, value } = e.target;
-		if (name === "createdAt") {
+		if (name === 'createdAt') {
 			setLocalCreatedAt(value);
-		} else if (name === "pushedAt") {
+		} else if (name === 'pushedAt') {
 			setLocalPushedAt(value);
 		}
 	};
@@ -377,16 +375,16 @@ const App = () => {
 							label="Created At"
 							fullWidth
 							name="createdAt"
-							value={localCreatedAt} 
-							onChange={handleLocalChange} 
+							value={localCreatedAt}
+							onChange={handleLocalChange}
 							margin="dense"
 						/>
 						<TextField
 							label="Pushed At"
 							fullWidth
 							name="pushedAt"
-							value={localPushedAt} 
-							onChange={handleLocalChange} 
+							value={localPushedAt}
+							onChange={handleLocalChange}
 							margin="dense"
 						/>
 					</DialogContent>
@@ -400,55 +398,61 @@ const App = () => {
 					</DialogActions>
 				</Dialog>
 
-
 				<Box id="project-box" sx={{ mt: 5, width: '80%' }}>
 					<Stack spacing={1} sx={{ display: 'flex', alignItems: 'center' }}>
-					<Typography variant="h4">Project List</Typography>
-				<Box sx={{ mt: 2 }}>
-				<Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 2 }}>
-				<FormControl fullWidth sx={{ minWidth: 230 }}>
-					<InputLabel id="sort-select-label">Sort By</InputLabel>
-					<Select
-						labelId="sort-select-label"
-						value={sortMode}
-						onChange={(event) => setSortMode(event.target.value)}
-						label="Sort By"
-					>
-						<MenuItem value="default">
-							<em>None</em>
-						</MenuItem>
-						<MenuItem value="name">Alphabetically</MenuItem>
-						<MenuItem value="newest">Newest</MenuItem>
-						<MenuItem value="oldest">Oldest</MenuItem>
-					</Select>
-				</FormControl>
-				<Box sx={{ minWidth: 230 }}>
-					<FormControl fullWidth>
-						<InputLabel id="language-select-label">Language</InputLabel>
-						<Select
-							labelId="language-select-label"
-							value={selectedLanguage}
-							onChange={handleSearchChange}
-							label="Language"
-							renderValue={() => (
-								<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-									<Chip key={selectedLanguage} label={selectedLanguage} />
+						<Typography variant="h4">Project List</Typography>
+						<Box sx={{ mt: 2 }}>
+							<Box
+								sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 2 }}
+							>
+								<FormControl fullWidth sx={{ minWidth: 230 }}>
+									<InputLabel id="sort-select-label">Sort By</InputLabel>
+									<Select
+										labelId="sort-select-label"
+										value={sortMode}
+										onChange={(event) => setSortMode(event.target.value)}
+										label="Sort By"
+									>
+										<MenuItem value="default">
+											<em>None</em>
+										</MenuItem>
+										<MenuItem value="name">Alphabetically</MenuItem>
+										<MenuItem value="newest">Newest</MenuItem>
+										<MenuItem value="oldest">Oldest</MenuItem>
+									</Select>
+								</FormControl>
+								<Box sx={{ minWidth: 230 }}>
+									<FormControl fullWidth>
+										<InputLabel id="language-select-label">Language</InputLabel>
+										<Select
+											labelId="language-select-label"
+											value={selectedLanguage}
+											onChange={handleSearchChange}
+											label="Language"
+											renderValue={() => (
+												<Box
+													sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}
+												>
+													<Chip
+														key={selectedLanguage}
+														label={selectedLanguage}
+													/>
+												</Box>
+											)}
+										>
+											<MenuItem value="">
+												<em>None</em>
+											</MenuItem>
+											{languages.map((item) => (
+												<MenuItem key={item} value={item}>
+													{item}
+												</MenuItem>
+											))}
+										</Select>
+									</FormControl>
 								</Box>
-							)}
-						>
-							<MenuItem value="">
-								<em>None</em>
-							</MenuItem>
-							{languages.map((item) => (
-								<MenuItem key={item} value={item}>
-									{item}
-								</MenuItem>
-							))}
-						</Select>
-					</FormControl>
-				</Box>
-			</Box>
-				</Box>
+							</Box>
+						</Box>
 						<Masonry columns={3} spacing={2}>
 							{filteredProjects.map((project) => (
 								<ProjectCard

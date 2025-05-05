@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { TextField, Button, Typography, Box, Stack } from '@mui/material';
+import axios from 'axios'; // Import axios
 
 const proxyUrl = import.meta.env.VITE_PROXY_URL;
 
@@ -18,12 +19,9 @@ const GithubRepoFetcher = ({ setProjectDetails }) => {
 		const repoPath = repoUrl.replace('https://github.com/', '');
 
 		try {
-			// Fetch repository details from the GitHub API
-			const response = await fetch(`${proxyUrl}/repos/${repoPath}`);
-			if (!response.ok) {
-				throw new Error('Repository not found');
-			}
-			const data = await response.json();
+			// Fetch repository details from the GitHub API using axios
+			const response = await axios.get(`${proxyUrl}/repos/${repoPath}`);
+			const data = response.data;
 
 			// Set the project details with the fetched data
 			setProjectDetails({
@@ -37,7 +35,11 @@ const GithubRepoFetcher = ({ setProjectDetails }) => {
 			setError(null);
 		} catch (error) {
 			// Set an error message if the fetch fails
-			setError(`Failed to fetch repository details: ${error.message}`);
+			setError(
+				`Failed to fetch repository details: ${
+					error.response?.data?.message || error.message
+				}`
+			);
 		}
 	}, [repoUrl, setProjectDetails]);
 
